@@ -43,44 +43,28 @@
 
 - (void)animateOneFrame
 {
-    // get Core Graphics (CG) graphics context (Quartz 2D)
-    
-    CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
-    CGContextSetShouldAntialias(context, 1);
-    
-    // get graphics context for push/pop
-    // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/CocoaDrawingGuide/GraphicsContexts/GraphicsContexts.html
+
+    // ** todo ** use only cocoa drawing (NS) rather than cocoa and quartz (CG)
+    // using cocoa drawing (a superset of quartz 2d)
 
     NSGraphicsContext* theContext = [NSGraphicsContext currentContext];
 
-    // set colors
-    
-    CGColorRef blue = CGColorCreateGenericRGB(1.0, 0.0, 0.0, 1.0);
-    CGColorRef yellow = CGColorCreateGenericRGB(0.0, 0.7, 0.18, 1.0);
+    // colors    
+    NSColor* red = [NSColor colorWithRed: 1.0 green: 0.0 blue: 0.0 alpha: 1.0];
+    NSColor* blue = [NSColor colorWithRed: 0.0 green: 0.0 blue: 1.0 alpha: 1.0];
     
     // get time
-    
     [self checkTime_nsdate];        // system time milliseconds (CGFloat) sweep
     
-    // bg
-    
-    CGRect bg = CGRectMake(0, 0, [self bounds].size.width, [self bounds].size.height);
-    CGContextSetRGBFillColor (context, 0, 0, 0, 1);
-    CGContextFillRect(context, bg);
-    
-    /*
-    // right circle
-    
-    CGContextSetFillColorWithColor(context, blue);
-    CGContextAddArc(context, xCenter+radius, yCenter, radius, radians(secondtodegree(sweepsecond) + 90), radians(secondtodegree(sweepsecond) - 90), 0);
-    CGContextFillPath(context);
-    CGContextSetFillColorWithColor(context, yellow);
-    CGContextAddArc(context, xCenter+radius, yCenter, radius, radians(secondtodegree(sweepsecond) + 90), radians(secondtodegree(sweepsecond) - 90), 1);
-    CGContextFillPath(context);
-    */
+    // bg     
+    [[NSColor blackColor] set];
+    NSRectFill([self bounds]);
     
     // spirals
     // better to just make a spiral object? with properties?
+    // could also "animate" the spiral in the build method, like an update using a counter
+    // best fit bezier from points? 
+    // http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/
 
     NSBezierPath* spiralLeft = [NSBezierPath bezierPath];
     NSBezierPath* spiralRight = [NSBezierPath bezierPath];
@@ -88,41 +72,51 @@
     spiralRight = [self buildBezierSpiralWithPath: spiralRight clockwise: false drawBezierPoints: false];
 
     // draw
-    // use animation instead of transforming rotation of drawing context !! ** fix **
 
     NSAffineTransform* xform = [NSAffineTransform transform];   // identity transform
+
+    [spiralRight setLineWidth:1.0];
     
-// Add the transformations
-[xform translateXBy:400.0 yBy:400.0];
-[xform concat];
- 
-// Draw content...
- 
-        [[NSColor whiteColor] setStroke];
-        [spiralRight setLineWidth:1.0];
-        [spiralRight stroke];
+    [xform translateXBy:100.0 yBy:100.0];
+    [xform concat];          
+    [red setStroke];
+    [spiralRight stroke];
 
-// Remove the transformations by applying the inverse transform.
-[xform invert];
+    [xform concat];          
+    [red setStroke];
+    [spiralRight stroke];
 
-[xform translateXBy:100.0 yBy:100.0];
-[xform concat];
+    [xform concat];          
+    [red setStroke];
+    [spiralRight stroke];
 
-        [[NSColor whiteColor] setStroke];
-        [spiralRight setLineWidth:1.0];
-        [spiralRight stroke];
+    [xform concat];          
+    [red setStroke];
+    [spiralRight stroke];
 
-[xform invert];
-[xform concat];
+    [xform concat];          
+    [red setStroke];
+    [spiralRight stroke];
 
+    [xform concat];          
+    [red setStroke];
+    [spiralRight stroke];
 
+    // Remove the transformations by applying the inverse transform
+    // [xform invert];
 
+    // [xform translateXBy:100.0 yBy:100.0];
+    // [xform concat];
 
-// [xform rotateByDegrees:90.0]; // counterclockwise rotation
+    // [blue setStroke];
+    // [spiralRight stroke];
 
+    // [xform invert];
+    // [xform concat];
+
+    // [xform rotateByDegrees:90.0]; // counterclockwise rotation
 
 /*
-
     [theContext saveGraphicsState]; // push             
     [xform translateXBy:xCenter/3 yBy:0.0];
     // [xform translateXBy:xCenter/2 yBy:yCenter/2];
@@ -142,16 +136,11 @@
     }
 
     [theContext restoreGraphicsState];  // pop
-
 */
 
-    // ** fix ** work out
-    // best fit bezier from points
-    // http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/
-    
     // [self debugText:xCenter/15 yPosition:yCenter/15 canvasWidth:200 canvasHeight:100];        // debug
-    
-    CGContextFlush(context);
+
+    [theContext flushGraphics];     // necessary?
 }
 
 - (NSBezierPath*)buildBezierSpiralWithPath:(NSBezierPath*)thisPath clockwise:(Boolean)clockwise drawBezierPoints:(Boolean)drawBezierPoints 
