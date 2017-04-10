@@ -82,19 +82,25 @@
     [red setStroke];
     [spiralRight stroke];
 
-    [xform concat];          
+    // [xform concat];          
+    [xform translateXBy:200.0 yBy:0.0];
+    [xform set];
     [red setStroke];
     [spiralRight stroke];
 
-    [xform concat];          
+    // [xform concat];          
+    [xform translateXBy:200.0 yBy:0.0];
+    [xform set];
     [red setStroke];
     [spiralRight stroke];
 
-    [xform concat];          
+    [xform scaleBy:0.5];
+    [xform set];          
     [red setStroke];
     [spiralRight stroke];
 
-    [xform concat];          
+    [xform translateXBy:200.0 yBy:0.0];
+    [xform set];          
     [red setStroke];
     [spiralRight stroke];
 
