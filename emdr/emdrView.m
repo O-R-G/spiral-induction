@@ -17,11 +17,15 @@
         [self setAnimationTimeInterval:1/30.0];
     }
 
-    // set global dims
+    // set globals
 
+    radius = ( [self bounds].size.width / 5 );
     xCenter = ( [self bounds].size.width / 2 );
     yCenter = ( [self bounds].size.height / 2 );
-    radius = ( [self bounds].size.width / 5 );
+    numberofspirals = 12;  
+    numberofpointsmax = 128;       // [64] [128] [256]
+    counter = 0;
+    direction = 1;
     
     return self;
 }
@@ -44,12 +48,12 @@
 - (void)animateOneFrame
 {
 
-    // ** todo ** use only cocoa drawing (NS) rather than cocoa and quartz (CG)
-    // using cocoa drawing (a superset of quartz 2d)
+    // using cocoa drawing (NS) (a superset of quartz 2d (CG))
 
-    NSGraphicsContext* theContext = [NSGraphicsContext currentContext];
+    NSGraphicsContext* context = [NSGraphicsContext currentContext];
 
     // colors    
+    NSColor* yellow = [NSColor colorWithRed: 1.0 green: 1.0 blue: 0.0 alpha: 1.0];
     NSColor* red = [NSColor colorWithRed: 1.0 green: 0.0 blue: 0.0 alpha: 1.0];
     NSColor* blue = [NSColor colorWithRed: 0.0 green: 0.0 blue: 1.0 alpha: 1.0];
     
@@ -68,92 +72,66 @@
 
     NSBezierPath* spiralLeft = [NSBezierPath bezierPath];
     NSBezierPath* spiralRight = [NSBezierPath bezierPath];
-    spiralLeft = [self buildBezierSpiralWithPath: spiralLeft clockwise: true drawBezierPoints: false];
-    spiralRight = [self buildBezierSpiralWithPath: spiralRight clockwise: false drawBezierPoints: false];
+    spiralLeft = [self buildBezierSpiralWithPath: spiralLeft clockwise: true drawBezierPoints: false numberofpoints: counter];
+    spiralRight = [self buildBezierSpiralWithPath: spiralRight clockwise: false drawBezierPoints: false numberofpoints: counter];
 
     // draw
 
-    NSAffineTransform* xform = [NSAffineTransform transform];   // identity transform
+    // [xform set] adds all the new transform to the matrix
+    // [xform concat] adds the new transform plus all existing transforms again to the matrix
+    // [xform invert] undoes the previous transform by applying an inverse transform to matrix
+    // [context saveGraphicsState] push current matrix onto the stack
+    // [context restoreGraphicsState] pop current matrix off the stack
+
+    NSAffineTransform* xform = [NSAffineTransform transform];           // identity transform (ground state)
 
     [spiralRight setLineWidth:1.0];
-    
-    [xform translateXBy:100.0 yBy:100.0];
-    [xform concat];          
-    [red setStroke];
-    [spiralRight stroke];
+    [spiralLeft setLineWidth:1.0];
+    [yellow setStroke];
 
-    // [xform concat];          
-    [xform translateXBy:200.0 yBy:0.0];
-    [xform set];
-    [red setStroke];
-    [spiralRight stroke];
+    for (int j = 0; j < numberofspirals/2; j++) {
+  
+        // left
 
-    // [xform concat];          
-    [xform translateXBy:200.0 yBy:0.0];
-    [xform set];
-    [red setStroke];
-    [spiralRight stroke];
+        [xform translateXBy:[self bounds].size.width/numberofspirals*j yBy: 0.0];
+        [xform set];  
+ 
+        for (int i = 0; i < numberofspirals; i++) {
+            [xform translateXBy:0.0 yBy:[self bounds].size.height/numberofspirals];
+            [xform set];          
+            [spiralLeft stroke];
+        }
 
-    [xform scaleBy:0.5];
-    [xform set];          
-    [red setStroke];
-    [spiralRight stroke];
+        // right
 
-    [xform translateXBy:200.0 yBy:0.0];
-    [xform set];          
-    [red setStroke];
-    [spiralRight stroke];
+        j++;
+        [xform translateXBy:[self bounds].size.width/numberofspirals*j yBy: -[self bounds].size.height];
+        [xform set];  
+ 
+        for (int i = 0; i < numberofspirals; i++) {
+            [xform translateXBy:0.0 yBy:[self bounds].size.height/numberofspirals];
+            [xform set];          
+            [spiralRight stroke];
+        }
 
-    [xform concat];          
-    [red setStroke];
-    [spiralRight stroke];
-
-    // Remove the transformations by applying the inverse transform
-    // [xform invert];
-
-    // [xform translateXBy:100.0 yBy:100.0];
-    // [xform concat];
-
-    // [blue setStroke];
-    // [spiralRight stroke];
-
-    // [xform invert];
-    // [xform concat];
-
-    // [xform rotateByDegrees:90.0]; // counterclockwise rotation
-
-/*
-    [theContext saveGraphicsState]; // push             
-    [xform translateXBy:xCenter/3 yBy:0.0];
-    // [xform translateXBy:xCenter/2 yBy:yCenter/2];
-    // [xform concat];         // apply the changes 
-
-    for (float i = 4; i > 0; i-=1.0) {
-
-        [theContext saveGraphicsState]; // push
-        [xform translateXBy:0.0 yBy: yCenter/i];
-        [xform concat];         // apply the changes 
-        [[NSColor whiteColor] setStroke];
-        [spiralRight setLineWidth:1.0];
-        [spiralRight stroke];
-        [xform invert];         // undo last
-        [xform invert];         // undo last
-        [theContext restoreGraphicsState];  // pop
+        // not working ** fix **
+        // need to work out saveGraphicsState!
+        // [xform invert];
+        [xform translateXBy:-[self bounds].size.width/numberofspirals * j yBy: -[self bounds].size.height];
+        [xform set];
     }
 
-    [theContext restoreGraphicsState];  // pop
-*/
+    // wind up, wind down
 
-    // [self debugText:xCenter/15 yPosition:yCenter/15 canvasWidth:200 canvasHeight:100];        // debug
+    counter += direction;
+    if (counter >= numberofpointsmax || counter <= 0) direction *= -1;
 
-    [theContext flushGraphics];     // necessary?
+    // [context flushGraphics];     // necessary?
 }
 
-- (NSBezierPath*)buildBezierSpiralWithPath:(NSBezierPath*)thisPath clockwise:(Boolean)clockwise drawBezierPoints:(Boolean)drawBezierPoints 
+- (NSBezierPath*)buildBezierSpiralWithPath:(NSBezierPath*)thisPath clockwise:(Boolean)clockwise drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints
 {
-    // int size = 16;
-    // int numberofpoints = 256;
-    int numberofpoints = 128;
+    float spiralsize = 0.35;        // [0.25] [0.35] [1.0]
     int direction = 1;
     if (!clockwise) direction = -1;
 
@@ -161,12 +139,13 @@
 
     for (float i = 0; i <= numberofpoints; i+=1.0) {
 
-        float x = i*2 * cos(secondtodegree(i) * direction);
-        float y = i*2 * sin(secondtodegree(i) * direction);
+        float x = i * spiralsize * cos(secondtodegree(i) * direction);
+        float y = i * spiralsize * sin(secondtodegree(i) * direction);
         [thisPath lineToPoint:NSMakePoint(x, y)];
 
         if (drawBezierPoints) {
-            NSBezierPath* aCircle = [NSBezierPath bezierPathWithOvalInRect:CGRectMake(x, y, 3.0, 3.0)];
+            NSRect thisRect = (NSRect){ .origin.x = x, .origin.y = y, .size.width = 3.0, .size.height = 3.0 };
+            NSBezierPath* aCircle = [NSBezierPath bezierPathWithOvalInRect:thisRect];
             [[NSColor blueColor] setFill];
             [aCircle setLineWidth:0.25];
             [aCircle fill];

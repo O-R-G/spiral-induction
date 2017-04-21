@@ -46,6 +46,8 @@ static inline CGFloat millisecondtodegree (CGFloat thissecond) {
     CGFloat sweephour, sweepminute, sweepsecond;    // NSDate (sweep)
     int hour, minute, second;                    // time_t (click)
     int xCenter, yCenter;
+    int numberofspirals, numberofpointsmax;
+    int counter, direction;
 }
 
 - (void) checkTime_nsdate;
