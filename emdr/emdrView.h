@@ -50,9 +50,10 @@ static inline CGFloat millisecondtodegree (CGFloat thissecond) {
     int rows, columns;
     int counter, direction;
     float spiralsize;
+    bool grid;              // draw spirals in a grid, otherwise l/r edges only
 }
 
-- (void) checkTime_nsdate;
+// - (void) checkTime_nsdate;
 
 @end
 

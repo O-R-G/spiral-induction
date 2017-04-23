@@ -1,16 +1,16 @@
-//
-//  emdrView.m
-//  emdr
-//
-//  Created by david reinfurt on 4/4/17.
-//  Copyright © 2017 O-R-G inc. All rights reserved.
+// 
+// emdrView.m 
+// emdr 
+// 
+// Created by david reinfurt on 4/4/17. 
+// Copyright © 2017 O-R-G inc. All rights reserved. 
 //
 
 #import "emdrView.h"
 
 @implementation emdrView
 
-- (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview
+- (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview 
 {
     self = [super initWithFrame:frame isPreview:isPreview];
     if (self) {
@@ -23,58 +23,55 @@
     xCenter = ( [self bounds].size.width / 2 );
     yCenter = ( [self bounds].size.height / 2 );
     rows = 8;
-    columns = 13;  
-    numberofpointsmax = 112;       // [64] [128] [256]
+    columns = 10;
+    numberofpointsmax = 102; // [64] [128] [256]
     counter = 0;
     direction = 1;
-    spiralsize = 0.45;        // [0.25] [0.35] [1.0]
+    spiralsize = 0.55; // [0.25] [0.35] [1.0]
+    grid = false;
     return self;
 }
 
-- (void)startAnimation
-{
+- (void)startAnimation {
     [super startAnimation];
 }
 
-- (void)stopAnimation
-{
+- (void)stopAnimation {
     [super stopAnimation];
 }
 
-- (void)drawRect:(NSRect)rect
-{
+- (void)drawRect:(NSRect)rect {
     [super drawRect:rect];
 }
 
-- (void)animateOneFrame
-{
+- (void)animateOneFrame {
 
     // using cocoa drawing (NS) (a superset of quartz 2d (CG))
 
     NSGraphicsContext* context = [NSGraphicsContext currentContext];
 
-    // colors    
+    // colors
     NSColor* yellow = [NSColor colorWithRed: 1.0 green: 1.0 blue: 0.0 alpha: 1.0];
     NSColor* red = [NSColor colorWithRed: 1.0 green: 0.0 blue: 0.0 alpha: 1.0];
     NSColor* blue = [NSColor colorWithRed: 0.0 green: 0.0 blue: 1.0 alpha: 1.0];
     
     // get time
-    [self checkTime_nsdate];        // system time milliseconds (CGFloat) sweep
+    [self checkTime_nsdate]; // system time milliseconds (CGFloat) sweep
     
-    // bg     
+    // bg
     [[NSColor blackColor] set];
     NSRectFill([self bounds]);
     
     // spirals
     // better to just make a spiral object? with properties?
     // could also "animate" the spiral in the build method, like an update using a counter
-    // best fit bezier from points? 
+    // best fit bezier from points?
     // http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/
 
     NSBezierPath* spiralLeft = [NSBezierPath bezierPath];
     NSBezierPath* spiralRight = [NSBezierPath bezierPath];
     spiralLeft = [self buildBezierSpiralWithPath: spiralLeft clockwise: true drawBezierPoints: false numberofpoints: counter];
-    spiralRight = [self buildBezierSpiralWithPath: spiralRight clockwise: false drawBezierPoints: false numberofpoints: counter];
+    spiralRight = [self buildBezierSpiralWithPath: spiralRight clockwise: false drawBezierPoints: false numberofpoints: numberofpointsmax - counter];
 
     // draw
  
@@ -84,48 +81,55 @@
     // [context saveGraphicsState] push current matrix onto the stack
     // [context restoreGraphicsState] pop current matrix off the stack
 
-    NSAffineTransform* xform = [NSAffineTransform transform];           // identity transform (ground state)
+    NSAffineTransform* xform = [NSAffineTransform transform]; // identity transform (ground state)
 
     [spiralRight setLineWidth:1.0];
     [spiralLeft setLineWidth:1.0];
     [yellow setStroke];
 
-    // offset x, y 
+    // 1. offset x, y to draw grid of spirals from centers based on screen width, height
         
-    [xform translateXBy:-[self bounds].size.width/columns/2 yBy:-[self bounds].size.height/rows/2];   
+    [xform translateXBy:-[self bounds].size.width/columns/2 yBy:-[self bounds].size.height/rows/2];
     [xform set];
 
     // columns
 
     for (int j = 0; j < columns; j++) {
   
-        // rows (left)
+        // rows (spiralRight)
+            
+        [xform translateXBy:[self bounds].size.width/columns yBy: 0.0];                 // shift x
+        [xform set];
+
+        for (int i = 0; i < rows; i++) {
+            [xform translateXBy:0.0 yBy:[self bounds].size.height/rows];                // shift y
+            [xform set];
+            [spiralRight stroke];
+        }
+
+        // if edgesonly then increment j a lot and translate x a lot
+
+        [xform translateXBy:0.0 yBy: -[self bounds].size.height]; // reset y
+        [xform set];
+
+        // rows (spiralLeft)
 
         [xform translateXBy:[self bounds].size.width/columns yBy: 0.0];                 // shift x
+        if (!grid) 
+            [xform translateXBy:[self bounds].size.width/columns*8 yBy: 0.0];           // shift x to edge
         [xform set];
  
         for (int i = 0; i < rows; i++) {
             [xform translateXBy:0.0 yBy:[self bounds].size.height/rows];                // shift y
-            [xform set];          
+            [xform set];
             [spiralLeft stroke];
         }
 
         [xform translateXBy:0.0 yBy: -[self bounds].size.height];                       // reset y
         [xform set];
 
-        // rows (right)
-
-        [xform translateXBy:[self bounds].size.width/columns yBy: 0.0];                 // shift x
-        [xform set];  
- 
-        for (int i = 0; i < rows; i++) {
-            [xform translateXBy:0.0 yBy:[self bounds].size.height/rows];                // shift y
-            [xform set];          
-            [spiralRight stroke];
-        }
-
-        [xform translateXBy:0.0 yBy: -[self bounds].size.height];                       // reset y
-        [xform set];
+        if (!grid) 
+            j = columns;                                                                // exit loop
     }
 
     // wind up, wind down
@@ -133,11 +137,11 @@
     counter += direction;
     if (counter >= numberofpointsmax || counter <= 0) direction *= -1;
 
-    [context flushGraphics];     // necessary?
+    [context flushGraphics]; // necessary?
 }
 
-- (NSBezierPath*)buildBezierSpiralWithPath:(NSBezierPath*)thisPath clockwise:(Boolean)clockwise drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints
-{
+- (NSBezierPath*)buildBezierSpiralWithPath:(NSBezierPath*)thisPath clockwise:(Boolean)clockwise 
+drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
     int spiraldirection = 1;
     if (!clockwise) spiraldirection = -1;
 
@@ -161,8 +165,7 @@
     return thisPath;
 }
 
-- (void) checkTime_nsdate
-{
+- (void) checkTime_nsdate {
     // get current time in milliseconds
     
     NSDate *now = [NSDate date];
@@ -180,19 +183,19 @@
     return;
 }
 
-- (void)debugText:(CGFloat)xPosition yPosition:(CGFloat)yPosition canvasWidth:(CGFloat)canvasWidth canvasHeight:(CGFloat)canvasHeight
-{
+- (void)debugText:(CGFloat)xPosition yPosition:(CGFloat)yPosition canvasWidth:(CGFloat)canvasWidth canvasHeight:(CGFloat)canvasHeight {
     //Draw Text
     CGRect textRect0 = CGRectMake(xPosition, yPosition, canvasWidth, canvasHeight);
     CGRect textRect1 = CGRectMake(xPosition, yPosition-12, canvasWidth, canvasHeight);
     CGRect textRect2 = CGRectMake(xPosition, yPosition-24, canvasWidth, canvasHeight);
     NSMutableParagraphStyle* textStyle = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
     textStyle.alignment = NSTextAlignmentLeft;
-    NSDictionary* textFontAttributes = @{NSFontAttributeName: [NSFont fontWithName: @"Courier New" size: 12], NSForegroundColorAttributeName: NSColor.redColor, NSParagraphStyleAttributeName: textStyle};
+    NSDictionary* textFontAttributes = @{NSFontAttributeName: [NSFont fontWithName: @"Courier New" size: 12], 
+    NSForegroundColorAttributeName: NSColor.redColor, NSParagraphStyleAttributeName: textStyle};
     
-    NSString *debug0 = [NSString stringWithFormat: @"0 :  %f", sweephour];
-    NSString *debug1 = [NSString stringWithFormat: @"1 :  %f", sweepminute];
-    NSString *debug2 = [NSString stringWithFormat: @"2 :  %f", sweepsecond];
+    NSString *debug0 = [NSString stringWithFormat: @"0 : %f", sweephour];
+    NSString *debug1 = [NSString stringWithFormat: @"1 : %f", sweepminute];
+    NSString *debug2 = [NSString stringWithFormat: @"2 : %f", sweepsecond];
     
     /*
      // output to log
@@ -209,13 +212,11 @@
     [debug2 drawInRect: textRect2 withAttributes: textFontAttributes];
 }
 
-- (BOOL)hasConfigureSheet
-{
+- (BOOL)hasConfigureSheet {
     return NO;
 }
 
-- (NSWindow*)configureSheet
-{
+- (NSWindow*)configureSheet {
     return nil;
 }
 
