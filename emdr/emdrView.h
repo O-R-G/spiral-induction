@@ -47,7 +47,9 @@ static inline CGFloat millisecondtodegree (CGFloat thissecond) {
     int hour, minute, second;                    // time_t (click)
     int xCenter, yCenter;
     int numberofspirals, numberofpointsmax;
+    int rows, columns;
     int counter, direction;
+    float spiralsize;
 }
 
 - (void) checkTime_nsdate;

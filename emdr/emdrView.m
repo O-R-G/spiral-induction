@@ -22,11 +22,12 @@
     radius = ( [self bounds].size.width / 5 );
     xCenter = ( [self bounds].size.width / 2 );
     yCenter = ( [self bounds].size.height / 2 );
-    numberofspirals = 12;  
-    numberofpointsmax = 128;       // [64] [128] [256]
+    rows = 8;
+    columns = 13;  
+    numberofpointsmax = 112;       // [64] [128] [256]
     counter = 0;
     direction = 1;
-    
+    spiralsize = 0.45;        // [0.25] [0.35] [1.0]
     return self;
 }
 
@@ -76,7 +77,7 @@
     spiralRight = [self buildBezierSpiralWithPath: spiralRight clockwise: false drawBezierPoints: false numberofpoints: counter];
 
     // draw
-
+ 
     // [xform set] adds all the new transform to the matrix
     // [xform concat] adds the new transform plus all existing transforms again to the matrix
     // [xform invert] undoes the previous transform by applying an inverse transform to matrix
@@ -89,35 +90,41 @@
     [spiralLeft setLineWidth:1.0];
     [yellow setStroke];
 
-    for (int j = 0; j < numberofspirals/2; j++) {
-  
-        // left
+    // offset x, y 
+        
+    [xform translateXBy:-[self bounds].size.width/columns/2 yBy:-[self bounds].size.height/rows/2];   
+    [xform set];
 
-        [xform translateXBy:[self bounds].size.width/numberofspirals*j yBy: 0.0];
-        [xform set];  
+    // columns
+
+    for (int j = 0; j < columns; j++) {
+  
+        // rows (left)
+
+        [xform translateXBy:[self bounds].size.width/columns yBy: 0.0];                 // shift x
+        [xform set];
  
-        for (int i = 0; i < numberofspirals; i++) {
-            [xform translateXBy:0.0 yBy:[self bounds].size.height/numberofspirals];
+        for (int i = 0; i < rows; i++) {
+            [xform translateXBy:0.0 yBy:[self bounds].size.height/rows];                // shift y
             [xform set];          
             [spiralLeft stroke];
         }
 
-        // right
+        [xform translateXBy:0.0 yBy: -[self bounds].size.height];                       // reset y
+        [xform set];
 
-        j++;
-        [xform translateXBy:[self bounds].size.width/numberofspirals*j yBy: -[self bounds].size.height];
+        // rows (right)
+
+        [xform translateXBy:[self bounds].size.width/columns yBy: 0.0];                 // shift x
         [xform set];  
  
-        for (int i = 0; i < numberofspirals; i++) {
-            [xform translateXBy:0.0 yBy:[self bounds].size.height/numberofspirals];
+        for (int i = 0; i < rows; i++) {
+            [xform translateXBy:0.0 yBy:[self bounds].size.height/rows];                // shift y
             [xform set];          
             [spiralRight stroke];
         }
 
-        // not working ** fix **
-        // need to work out saveGraphicsState!
-        // [xform invert];
-        [xform translateXBy:-[self bounds].size.width/numberofspirals * j yBy: -[self bounds].size.height];
+        [xform translateXBy:0.0 yBy: -[self bounds].size.height];                       // reset y
         [xform set];
     }
 
@@ -126,21 +133,20 @@
     counter += direction;
     if (counter >= numberofpointsmax || counter <= 0) direction *= -1;
 
-    // [context flushGraphics];     // necessary?
+    [context flushGraphics];     // necessary?
 }
 
 - (NSBezierPath*)buildBezierSpiralWithPath:(NSBezierPath*)thisPath clockwise:(Boolean)clockwise drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints
 {
-    float spiralsize = 0.35;        // [0.25] [0.35] [1.0]
-    int direction = 1;
-    if (!clockwise) direction = -1;
+    int spiraldirection = 1;
+    if (!clockwise) spiraldirection = -1;
 
     [thisPath moveToPoint:NSMakePoint(0.0, 0.0)];
 
     for (float i = 0; i <= numberofpoints; i+=1.0) {
 
-        float x = i * spiralsize * cos(secondtodegree(i) * direction);
-        float y = i * spiralsize * sin(secondtodegree(i) * direction);
+        float x = i * spiralsize * cos(secondtodegree(i) * spiraldirection);
+        float y = i * spiralsize * sin(secondtodegree(i) * spiraldirection);
         [thisPath lineToPoint:NSMakePoint(x, y)];
 
         if (drawBezierPoints) {
