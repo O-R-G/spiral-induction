@@ -13,9 +13,8 @@
 - (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview 
 {
     self = [super initWithFrame:frame isPreview:isPreview];
-    if (self) {
+    if (self) 
         [self setAnimationTimeInterval:1/30.0];
-    }
 
     // set globals
 
@@ -27,7 +26,8 @@
     numberofpointsmax = 102; // [64] [128] [256]
     counter = 0;
     direction = 1;
-    spiralsize = 0.55; // [0.25] [0.35] [1.0]
+    spiralsize = ( [self bounds].size.height / (columns*150) );     // hardcoded ** fix **
+    // spiralsize = 0.55; // [0.25] [0.35] [1.0]
     grid = false;
     return self;
 }
@@ -50,15 +50,12 @@
 
     NSGraphicsContext* context = [NSGraphicsContext currentContext];
 
-    // colors
+    [self checkTime_nsdate]; // system time milliseconds (CGFloat) sweep
+
     NSColor* yellow = [NSColor colorWithRed: 1.0 green: 1.0 blue: 0.0 alpha: 1.0];
     NSColor* red = [NSColor colorWithRed: 1.0 green: 0.0 blue: 0.0 alpha: 1.0];
     NSColor* blue = [NSColor colorWithRed: 0.0 green: 0.0 blue: 1.0 alpha: 1.0];
-    
-    // get time
-    [self checkTime_nsdate]; // system time milliseconds (CGFloat) sweep
-    
-    // bg
+        
     [[NSColor blackColor] set];
     NSRectFill([self bounds]);
     
@@ -117,6 +114,7 @@
         [xform translateXBy:[self bounds].size.width/columns yBy: 0.0];                 // shift x
         if (!grid) 
             [xform translateXBy:[self bounds].size.width/columns*8 yBy: 0.0];           // shift x to edge
+                                                                                        // hardcoded, ** fix **
         [xform set];
  
         for (int i = 0; i < rows; i++) {
@@ -184,6 +182,7 @@ drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
 }
 
 - (void)debugText:(CGFloat)xPosition yPosition:(CGFloat)yPosition canvasWidth:(CGFloat)canvasWidth canvasHeight:(CGFloat)canvasHeight {
+
     //Draw Text
     CGRect textRect0 = CGRectMake(xPosition, yPosition, canvasWidth, canvasHeight);
     CGRect textRect1 = CGRectMake(xPosition, yPosition-12, canvasWidth, canvasHeight);
