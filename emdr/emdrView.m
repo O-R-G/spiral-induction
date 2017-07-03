@@ -74,7 +74,7 @@
     NSBezierPath* spiralDouble = [NSBezierPath bezierPath];
     spiralLeft = [self buildBezierSpiralWithPath: spiralLeft clockwise: true drawBezierPoints: false numberofpoints: counter];
     spiralRight = [self buildBezierSpiralWithPath: spiralRight clockwise: false drawBezierPoints: false numberofpoints: numberofpointsmax - counter];
-    spiralDouble = [self buildBezierDoubleSpiralWithPath: spiralDouble clockwise: true drawBezierPoints: false numberofpoints: counter];
+    spiralDouble = [self buildBezierDoubleSpiralWithPath: spiralDouble clockwise: true drawBezierPoints: true numberofpoints: counter];
 
     // draw
  
@@ -86,8 +86,9 @@
 
     NSAffineTransform* xform = [NSAffineTransform transform]; // identity transform (ground state)
 
-    // [spiralLeft setLineWidth:1.0];
-    [spiralDouble setLineWidth:3.0];
+    [spiralLeft setLineWidth:1.0];
+    [spiralRight setLineWidth:1.0];
+    [spiralDouble setLineWidth:1.0];
     [green setStroke];
 
 
@@ -96,11 +97,7 @@
     [xform translateXBy: [self bounds].size.width/2 yBy: [self bounds].size.height/2];
     [xform set];
 
-        [spiralDouble stroke];
-
-
-
-
+    [spiralDouble stroke];
 
 
     /*
@@ -193,24 +190,39 @@ drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
     // this builds a double spiral, when it arrives at max number of points then 
     // proceed to the next spiral, unwrapping it
 
+    // ** fix ** 
+    // draw from a logical centerpoint of the entire shape width (height is ok)
+
     int spiraldirection = 1;
     if (!clockwise) spiraldirection = -1;
 
+    numberofpoints *= 2;                            // double spiral, so 2 x numberofpoints
+                                                    // more points draws faster b/c tied to seconds timer
+    int numberofpointsleft = numberofpoints / 2;     
+    int numberofpointsright = numberofpointsleft; 
+
+    int xoffset = [self bounds].size.width / 5;
+
     [thisPath moveToPoint:NSMakePoint(0.0, 0.0)];
 
-    for (float i = 0; i <= numberofpoints; i+=1.0) {
+    // left
+
+    for (float i = 0; i <= numberofpointsleft; i+=1.0) {
 
         float x = i * spiralsize * cos(secondtodegree(i) * spiraldirection);
         float y = i * spiralsize * sin(secondtodegree(i) * spiraldirection);
-        [thisPath lineToPoint:NSMakePoint(x, y)];
+        [thisPath lineToPoint:NSMakePoint(x, y)];        
+    }
 
-        if (drawBezierPoints) {
-            NSRect thisRect = (NSRect){ .origin.x = x, .origin.y = y, .size.width = 3.0, .size.height = 3.0 };
-            NSBezierPath* aCircle = [NSBezierPath bezierPathWithOvalInRect:thisRect];
-            [[NSColor blueColor] setFill];
-            [aCircle setLineWidth:0.25];
-            [aCircle fill];
-        }
+    spiraldirection *= -1;                          // flip-flop spiral direction
+
+    // right
+
+    for (float i = numberofpointsright; i >= 0; i-=1.0) {
+
+        float x = i * spiralsize * cos(secondtodegree(i) * spiraldirection) + xoffset;
+        float y = i * spiralsize * sin(secondtodegree(i) * spiraldirection);
+        [thisPath lineToPoint:NSMakePoint(x, y)];        
     }
 
     return thisPath;
