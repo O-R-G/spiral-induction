@@ -28,7 +28,7 @@
     direction = 1;
     spiralsize = ( [self bounds].size.height / (columns*150) );     // hardcoded ** fix **
     // spiralsize = 0.55; // [0.25] [0.35] [1.0]
-    grid = false;
+    grid = true;
     return self;
 }
 
@@ -53,6 +53,7 @@
     [self checkTime_nsdate]; // system time milliseconds (CGFloat) sweep
 
     NSColor* yellow = [NSColor colorWithRed: 1.0 green: 1.0 blue: 0.0 alpha: 1.0];
+    NSColor* green = [NSColor colorWithRed: 0.0 green: 1.0 blue: 0.0 alpha: 1.0];
     NSColor* red = [NSColor colorWithRed: 1.0 green: 0.0 blue: 0.0 alpha: 1.0];
     NSColor* blue = [NSColor colorWithRed: 0.0 green: 0.0 blue: 1.0 alpha: 1.0];
         
@@ -82,7 +83,7 @@
 
     [spiralRight setLineWidth:1.0];
     [spiralLeft setLineWidth:1.0];
-    [yellow setStroke];
+    [green setStroke];
 
     // 1. offset x, y to draw grid of spirals from centers based on screen width, height
         
@@ -138,8 +139,40 @@
     [context flushGraphics]; // necessary?
 }
 
+// spirals
+
 - (NSBezierPath*)buildBezierSpiralWithPath:(NSBezierPath*)thisPath clockwise:(Boolean)clockwise 
 drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
+    int spiraldirection = 1;
+    if (!clockwise) spiraldirection = -1;
+
+    [thisPath moveToPoint:NSMakePoint(0.0, 0.0)];
+
+    for (float i = 0; i <= numberofpoints; i+=1.0) {
+
+        float x = i * spiralsize * cos(secondtodegree(i) * spiraldirection);
+        float y = i * spiralsize * sin(secondtodegree(i) * spiraldirection);
+        [thisPath lineToPoint:NSMakePoint(x, y)];
+
+        if (drawBezierPoints) {
+            NSRect thisRect = (NSRect){ .origin.x = x, .origin.y = y, .size.width = 3.0, .size.height = 3.0 };
+            NSBezierPath* aCircle = [NSBezierPath bezierPathWithOvalInRect:thisRect];
+            [[NSColor blueColor] setFill];
+            [aCircle setLineWidth:0.25];
+            [aCircle fill];
+        }
+    }
+
+    return thisPath;
+}
+
+- (NSBezierPath*)buildBezierDoubleSpiralWithPath:(NSBezierPath*)thisPath clockwise:(Boolean)clockwise 
+drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
+
+    // ** todo **
+    // this builds a double spiral, when it arrives at max number of points then 
+    // proceed to the next spiral, unwrapping it
+
     int spiraldirection = 1;
     if (!clockwise) spiraldirection = -1;
 
