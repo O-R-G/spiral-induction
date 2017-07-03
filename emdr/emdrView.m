@@ -66,10 +66,15 @@
     // best fit bezier from points?
     // http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/
 
+    // ** fix ** paths should be initialized once and then updated
+    // perhaps 2d array of arrays of points per to keep track or just a pointer of where in array to draw to
+
     NSBezierPath* spiralLeft = [NSBezierPath bezierPath];
     NSBezierPath* spiralRight = [NSBezierPath bezierPath];
+    NSBezierPath* spiralDouble = [NSBezierPath bezierPath];
     spiralLeft = [self buildBezierSpiralWithPath: spiralLeft clockwise: true drawBezierPoints: false numberofpoints: counter];
     spiralRight = [self buildBezierSpiralWithPath: spiralRight clockwise: false drawBezierPoints: false numberofpoints: numberofpointsmax - counter];
+    spiralDouble = [self buildBezierDoubleSpiralWithPath: spiralDouble clockwise: true drawBezierPoints: false numberofpoints: counter];
 
     // draw
  
@@ -81,10 +86,24 @@
 
     NSAffineTransform* xform = [NSAffineTransform transform]; // identity transform (ground state)
 
-    [spiralRight setLineWidth:1.0];
-    [spiralLeft setLineWidth:1.0];
+    // [spiralLeft setLineWidth:1.0];
+    [spiralDouble setLineWidth:3.0];
     [green setStroke];
 
+
+    // 0. ignore grid, draw only one spiral in screen center
+
+    [xform translateXBy: [self bounds].size.width/2 yBy: [self bounds].size.height/2];
+    [xform set];
+
+        [spiralDouble stroke];
+
+
+
+
+
+
+    /*
     // 1. offset x, y to draw grid of spirals from centers based on screen width, height
         
     [xform translateXBy:-[self bounds].size.width/columns/2 yBy:-[self bounds].size.height/rows/2];
@@ -100,15 +119,15 @@
         [xform set];
 
         for (int i = 0; i < rows; i++) {
-            [xform translateXBy:0.0 yBy:[self bounds].size.height/rows];                // shift y
+            [xform translateXBy:0.0 yBy:[self bounds].size.height/rows];             // shift y
             [xform set];
             [spiralRight stroke];
         }
 
         // if edgesonly then increment j a lot and translate x a lot
 
-        [xform translateXBy:0.0 yBy: -[self bounds].size.height]; // reset y
-        [xform set];
+        [xform translateXBy:0.0 yBy: -[self bounds].size.height];                       // reset y
+            [xform set];
 
         // rows (spiralLeft)
 
@@ -130,6 +149,7 @@
         if (!grid) 
             j = columns;                                                                // exit loop
     }
+    */
 
     // wind up, wind down
 
