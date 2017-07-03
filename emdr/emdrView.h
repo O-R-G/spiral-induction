@@ -12,7 +12,7 @@
 
 #define PI 3.14159265358979323846
 
-static inline double radians(double degrees) {
+static inline CGFloat radians(CGFloat degrees) {
     return degrees * PI / 180;
 }
 

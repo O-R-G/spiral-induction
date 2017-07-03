@@ -23,7 +23,7 @@
     yCenter = ( [self bounds].size.height / 2 );
     rows = 8;
     columns = 10;
-    numberofpointsmax = 102; // [64] [128] [256]
+    numberofpointsmax = 120; // [64] [102] [128] [256]
     counter = 0;
     direction = 1;
     spiralsize = ( [self bounds].size.height / (columns*150) );     // hardcoded ** fix **
@@ -158,10 +158,12 @@
 
 // spirals
 
+// single 
+
 - (NSBezierPath*)buildBezierSpiralWithPath:(NSBezierPath*)thisPath clockwise:(Boolean)clockwise 
 drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
     int spiraldirection = 1;
-    if (!clockwise) spiraldirection = -1;
+    if (clockwise) spiraldirection = -1;
 
     [thisPath moveToPoint:NSMakePoint(0.0, 0.0)];
 
@@ -183,6 +185,8 @@ drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
     return thisPath;
 }
 
+// double
+
 - (NSBezierPath*)buildBezierDoubleSpiralWithPath:(NSBezierPath*)thisPath clockwise:(Boolean)clockwise 
 drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
 
@@ -194,36 +198,74 @@ drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
     // draw from a logical centerpoint of the entire shape width (height is ok)
 
     int spiraldirection = 1;
-    if (!clockwise) spiraldirection = -1;
+    if (clockwise) spiraldirection = -1;
 
-    numberofpoints *= 2;                            // double spiral, so 2 x numberofpoints
-                                                    // more points draws faster b/c tied to seconds timer
+    // numberofpoints always = counter when called
+
+    // numberofpoints *= 2.52;                              // ** temp ** hardcoded number ends correctly ** fix **
+    numberofpoints *= 2;                                    // double spiral, so 2 x numberofpoints
+                                                            // more points draws faster
     int numberofpointsleft = numberofpoints / 2;     
     int numberofpointsright = numberofpointsleft; 
 
-    int xoffset = [self bounds].size.width / 5;
+    // int xoffset = [self bounds].size.width / 5;
+    int xoffset = 300;
+    int yoffset = [self bounds].size.height / 5;
 
     [thisPath moveToPoint:NSMakePoint(0.0, 0.0)];
 
     // left
 
+        
+    float radlast;          // temp debug ** fix ** 
+
     for (float i = 0; i <= numberofpointsleft; i+=1.0) {
 
+        /*
         float x = i * spiralsize * cos(secondtodegree(i) * spiraldirection);
         float y = i * spiralsize * sin(secondtodegree(i) * spiraldirection);
+        */
+
+        float x = i * spiralsize * cos(radians(secondtodegree(i)) * spiraldirection);
+        float y = i * spiralsize * sin(radians(secondtodegree(i)) * spiraldirection);
         [thisPath lineToPoint:NSMakePoint(x, y)];        
+
+        // output to log (not working)
+
+        // NSLog(@"x: %f", x);
+        // NSLog(@"y: %f", y);
+        // NSLog(@"rad: %f", radians(secondtodegree(i)));
+        radlast = radians(secondtodegree(i));
     }
 
-    spiraldirection *= -1;                          // flip-flop spiral direction
+    // debug radians and counter        
 
-    // right
+    NSLog(@"counter --> %i", counter);
+    NSLog(@"rad: %f", radlast);
 
-    for (float i = numberofpointsright; i >= 0; i-=1.0) {
+    if (counter == numberofpointsmax) 
+        NSLog(@"**** SWITCH ****");
 
-        float x = i * spiralsize * cos(secondtodegree(i) * spiraldirection) + xoffset;
-        float y = i * spiralsize * sin(secondtodegree(i) * spiraldirection);
-        [thisPath lineToPoint:NSMakePoint(x, y)];        
+    if (counter == numberofpointsmax / 2 ) 
+        NSLog(@"**** half = %f ****", radlast);
+
+/*
+    // if left spiral completed then start right
+
+    if (counter >= numberofpointsmax / 2 ) {
+
+        // spiraldirection *= -1;                          // flip-flop spiral direction
+
+        // right
+
+        for (float i = numberofpointsright; i >= 0; i-=1.0) {
+
+            float x = i * spiralsize * cos(secondtodegree(i) * spiraldirection) + xoffset;
+            float y = i * spiralsize * sin(secondtodegree(i) * spiraldirection) - yoffset;
+            [thisPath lineToPoint:NSMakePoint(x, y)];        
+        }
     }
+*/
 
     return thisPath;
 }
