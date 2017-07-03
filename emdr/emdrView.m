@@ -53,7 +53,7 @@
     [self checkTime_nsdate]; // system time milliseconds (CGFloat) sweep
 
     NSColor* yellow = [NSColor colorWithRed: 1.0 green: 1.0 blue: 0.0 alpha: 1.0];
-    NSColor* green = [NSColor colorWithRed: 0.0 green: 1.0 blue: 0.0 alpha: 1.0];
+    NSColor* green = [NSColor colorWithRed: 0.25 green: 0.75 blue: 0.0 alpha: 1.0];
     NSColor* red = [NSColor colorWithRed: 1.0 green: 0.0 blue: 0.0 alpha: 1.0];
     NSColor* blue = [NSColor colorWithRed: 0.0 green: 0.0 blue: 1.0 alpha: 1.0];
         
@@ -90,6 +90,14 @@
     [spiralRight setLineWidth:1.0];
     [spiralDouble setLineWidth:1.0];
     [green setStroke];
+
+    /*
+    // debug
+    if (counter >= numberofpointsmax / 2) 
+        [red setStroke];
+    else 
+        [green setStroke];
+    */
 
 
     // 0. ignore grid, draw only one spiral in screen center
@@ -202,46 +210,77 @@ drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
 
     // numberofpoints always = counter when called
 
-    // numberofpoints *= 2.52;                              // ** temp ** hardcoded number ends correctly ** fix **
     numberofpoints *= 2;                                    // double spiral, so 2 x numberofpoints
                                                             // more points draws faster
-    int numberofpointsleft = numberofpoints / 2;     
+    int numberofpointsleft = numberofpoints;     
     int numberofpointsright = numberofpointsleft; 
 
-    // int xoffset = [self bounds].size.width / 5;
-    int xoffset = 300;
+    int xoffset = [self bounds].size.width / 15;
     int yoffset = [self bounds].size.height / 5;
 
+    Boolean drawspiralright;
+
     [thisPath moveToPoint:NSMakePoint(0.0, 0.0)];
-
-    // left
-
         
-    float radlast;          // temp debug ** fix ** 
+    float radlast;                                          // temp debug ** fix ** 
 
-    for (float i = 0; i <= numberofpointsleft; i+=1.0) {
-
-        /*
-        float x = i * spiralsize * cos(secondtodegree(i) * spiraldirection);
-        float y = i * spiralsize * sin(secondtodegree(i) * spiraldirection);
-        */
-
-        float x = i * spiralsize * cos(radians(secondtodegree(i)) * spiraldirection);
-        float y = i * spiralsize * sin(radians(secondtodegree(i)) * spiraldirection);
-        [thisPath lineToPoint:NSMakePoint(x, y)];        
-
-        // output to log (not working)
-
-        // NSLog(@"x: %f", x);
-        // NSLog(@"y: %f", y);
-        // NSLog(@"rad: %f", radians(secondtodegree(i)));
-        radlast = radians(secondtodegree(i));
+    if (counter >= numberofpointsmax / 2 ) {                // half
+        // numberofpointsleft = numberofpointsmax;
+        numberofpointsleft = numberofpointsmax - counter;
+        numberofpointsright = numberofpointsmax - counter;
+        drawspiralright = true;
+    } else {
+        // ?
     }
 
-    // debug radians and counter        
+    drawspiralright = true;
+    numberofpointsleft = numberofpointsmax - 10;
+    
+    // left
 
-    NSLog(@"counter --> %i", counter);
-    NSLog(@"rad: %f", radlast);
+    if (!drawspiralright) {
+
+        for (float i = 0; i <= numberofpointsleft; i+=1.0) {
+
+            float x = i * spiralsize * cos(radians(secondtodegree(i)) * spiraldirection);
+            float y = i * spiralsize * sin(radians(secondtodegree(i)) * spiraldirection);
+            [thisPath lineToPoint:NSMakePoint(x, y)];        
+
+            radlast = radians(secondtodegree(i));               // ** debug **  
+        }
+
+    } else {
+
+        for (float i = numberofpointsleft; i >= 0; i-=1.0) {
+ 
+            float x = i * spiralsize * cos(radians(secondtodegree(i)) * spiraldirection);
+            float y = i * spiralsize * sin(radians(secondtodegree(i)) * spiraldirection);
+            [thisPath lineToPoint:NSMakePoint(x, y)];        
+
+            radlast = radians(secondtodegree(i));               // ** debug **  
+        }
+    }
+
+/*
+    // right
+
+    if (drawspiralright) {
+
+        // spiraldirection *= -1;                          // flip-flop spiral direction
+
+        for (float i = numberofpointsright; i >= 0; i-=1.0) {
+    
+            float x = i * spiralsize * cos(radians(secondtodegree(i)) * spiraldirection) + xoffset;
+            float y = i * spiralsize * sin(radians(secondtodegree(i)) * spiraldirection) + yoffset;
+            [thisPath lineToPoint:NSMakePoint(x, y)];        
+
+            radlast = radians(secondtodegree(i));               // ** debug **  
+        }
+
+    }
+*/
+
+    // debug radians and counter        
 
     if (counter == numberofpointsmax) 
         NSLog(@"**** SWITCH ****");
@@ -250,26 +289,11 @@ drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
     // b/c 120 is a multiple of 60 and a value in range 0-60 is fed to secondtodegree to produce value in range 0-360 
     // which is then converted to radians
 
-    if (counter == numberofpointsmax / 2 ) 
+    if (counter == numberofpointsmax / 2 ) {
         NSLog(@"**** half = %f ****", radlast);
-
-/*
-    // if left spiral completed then start right
-
-    if (counter >= numberofpointsmax / 2 ) {
-
-        // spiraldirection *= -1;                          // flip-flop spiral direction
-
-        // right
-
-        for (float i = numberofpointsright; i >= 0; i-=1.0) {
-
-            float x = i * spiralsize * cos(secondtodegree(i) * spiraldirection) + xoffset;
-            float y = i * spiralsize * sin(secondtodegree(i) * spiraldirection) - yoffset;
-            [thisPath lineToPoint:NSMakePoint(x, y)];        
-        }
+        NSLog(@"counter --> %i", counter);
+        NSLog(@"rad: %f", radlast);
     }
-*/
 
     return thisPath;
 }
