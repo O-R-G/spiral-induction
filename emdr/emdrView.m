@@ -246,6 +246,10 @@ drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
     if (counter == numberofpointsmax) 
         NSLog(@"**** SWITCH ****");
 
+    // can switch when radians == 0.00 instead of on numberofpoints ... always == 0.00 here if numberofpoints = 120
+    // b/c 120 is a multiple of 60 and a value in range 0-60 is fed to secondtodegree to produce value in range 0-360 
+    // which is then converted to radians
+
     if (counter == numberofpointsmax / 2 ) 
         NSLog(@"**** half = %f ****", radlast);
 
