@@ -38,9 +38,9 @@
 
     // grid
               
-    rows = 4;
-    columns = 5;
-    extrudes = 20;
+    rows = 6;
+    columns = 9;
+    extrudes = 15;
     offsetx = [self bounds].size.width / (columns + 1);     // between columns
     offsety = [self bounds].size.height / (rows + 1);       // between rows
     offsetz = 4;                                            // between extrudes
@@ -78,9 +78,8 @@
     NSRectFill([self bounds]);                                  // clear screen
 
     NSBezierPath* spiralPath = [NSBezierPath bezierPath];
-    // spiralPath = [self buildBezierPathFromPoints: spiralPath clockwise: true numberofpoints: counter];
     spiralPath = [self buildBezierPathFromPointsWithIndex: spiralPath 
-clockwise: true numberofpoints: counter indexstart: 10 indexdirection: 
+clockwise: true numberofpoints: counter indexstart: 0 indexdirection: 
 direction];
     [spiralPath setLineWidth:1.0];
     [green setStroke];
@@ -138,7 +137,8 @@ clockwise:(Boolean)clockwise numberofpoints:(int)numberofpoints indexstart:
     
     int index = indexstart;
     if (!indexstart) indexstart = 0;
-    if (!indexdirection) indexdirection = 1;                    // 1 | -1
+    // if (!indexdirection) indexdirection = 1;                    // 1 | -1
+    indexdirection = 1;                    // 1 | -1
     // int indexstop = indexstart + (numberofpoints * indexdirection);
  
     id object = [points objectAtIndex:indexstart];
