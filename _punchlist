@@ -1,6 +1,11 @@
-- grid 
-- smooth line thru bezier points=
++ extrusions
++ grid
++ grid fix hardcoding
+- spiral dynamic sizing
+- draw / erase spiral
+- smooth line thru bezier points
   http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/
+- graphics speedup cggraphics bitmaps
+  http://alodar.com/docs/whitepapers/whitePaper-fastDrawMac.pdf
 - double spiral constructor
 - add non-linear movement to spiral dwg
-- layered spirals ("copy paste")

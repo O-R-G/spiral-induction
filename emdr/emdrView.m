@@ -18,35 +18,49 @@
     if (self) 
         [self setAnimationTimeInterval:1/30.0];
 
-    // set globals
+    // utility
+
+    // spirals
 
     radius = ( [self bounds].size.width / 5 );
     xCenter = ( [self bounds].size.width / 2 );
     yCenter = ( [self bounds].size.height / 2 );
-    numberofpointsmax = 30; // [64] [102] [128] [256]
-    grid = true;
+    numberofpointsmax = 30;                     // [64] [102] [128] [256]
+                                                // large effect on speed, smaller better
     counter = 0;
+    grid = true;
+    debug = false;
 
-    // set drawing context
+    // grid
+              
+    rows = 4;
+    columns = 5;
+    extrudes = 20;
+    offsetx = [self bounds].size.width / (columns + 1);     // between columns
+    offsety = [self bounds].size.height / (rows + 1);       // between rows
+    offsetz = 4;                                            // between extrudes
+
+    if (debug) NSLog(@"offsetx [self bounds].size.width = %f", [self bounds].size.width);
+    if (debug) NSLog(@"offsetx = %d", offsetx);
+    if (debug) NSLog(@"offsety [self bounds].size.height = %f", [self bounds].size.height);
+    if (debug) NSLog(@"offsety = %d", offsety);
+
+    // graphics context
 
     context = [NSGraphicsContext currentContext];
     red = [NSColor colorWithRed: 1.0 green: 0.0 blue: 0.0 alpha: 1.0];
     green = [NSColor colorWithRed: 0.25 green: 0.75 blue: 0.0 alpha: 1.0];
     blue = [NSColor colorWithRed: 0.0 green: 0.0 blue: 1.0 alpha: 1.0];
+    [[NSColor blackColor] setFill];
 
     // build spiral
 
     spiral = [[Spiral alloc] init];
     [spiral makeWithPoints: numberofpointsmax clockwise: false];
 
-    // spiralsize = [spiral size];
     direction = [spiral direction];    
-    // NSMutableArray* points = [spiral points];
     points = [spiral points];
-    // NSLog(@"points[2] -------------> : %@", [points objectAtIndex:2]);
-    // NSLog(@"thispoints[2] -------------> : %@", [[spiral points] objectAtIndex:2]);
-
-    // [spiral debug];
+    if (debug) [spiral debug];
 
     return self;
 }
@@ -65,48 +79,28 @@
 
 - (void)animateOneFrame {
 
-    [[NSColor blackColor] set];
-    NSRectFill([self bounds]);
+    NSRectFill([self bounds]);                                  // clear screen
 
     NSBezierPath* spiralSingle = [NSBezierPath bezierPath];
     spiralSingle = [self buildBezierPathFromPoints: spiralSingle clockwise: true numberofpoints: counter];
-
-    // draw
- 
-    // [xform set] adds all the new transform to the matrix
-    // [xform concat] adds the new transform plus all existing transforms again to the matrix
-    // [xform invert] undoes the previous transform by applying an inverse transform to matrix
-    // [context saveGraphicsState] push current matrix onto the stack
-    // [context restoreGraphicsState] pop current matrix off the stack
-
-    NSAffineTransform* xform = [NSAffineTransform transform]; // identity transform (ground state)
-
-    [green setStroke];
     [spiralSingle setLineWidth:1.0];
+    [green setStroke];
 
-    int extrudes = 40;
-    int columns = 5;
-    int rows = 4;
-    int offsetx = 200;
-    int offsety = 200;
-    int offsetz = 10; // [16]
+    NSAffineTransform* xform = [NSAffineTransform transform];   // identity
+    [xform translateXBy: 0.0 yBy: -offsety / 3];                // adjust
 
-    // [xform translateXBy: [self bounds].size.width/2 yBy: [self bounds].size.height/2];
-    [xform translateXBy: 0 yBy: -100.0];
-    [xform set];
-
-    for (int y = 0; y < rows; y++) {                
+    for (int y = 0; y < rows; y++) {
 
         // row
 
-        [xform translateXBy: 0 yBy: offsety];
+        [xform translateXBy: 0.0 yBy: offsety];
         [xform set];
 
         for (int x = 0; x < columns; x++) {         
 
             // column
 
-            [xform translateXBy: offsetx yBy: 0];
+            [xform translateXBy: offsetx yBy: 0.0];
             [xform set];
 
             for (int i = 0; i < extrudes; i++) {
@@ -120,28 +114,21 @@
             
             // reset extrude
 
-            // [xform invert];
-
             [xform translateXBy: offsetz * extrudes yBy: -offsetz * extrudes];
             [xform set];
         }            
 
         // reset column
             
-        // [xform translateXBy: -offsetx * columns + 40 yBy: 0];
-        // [xform translateXBy: -offsetx * columns + offsetz * columns yBy: 0];
-        [xform translateXBy: -offsetx * columns yBy: 0];
+        [xform translateXBy: -offsetx * columns yBy: 0.0];
         [xform set];
-
-        // no need to reset row
     }
 
-    // 1. wind up / wind down
+    // wind up / down
 
     counter += direction;
     if (counter >= numberofpointsmax || counter <= 0) direction *= -1;
-
-    counter = numberofpointsmax;        // static ** debug **
+    if (debug) counter = numberofpointsmax;
 }
 
 
@@ -167,8 +154,8 @@ numberofpoints:(int)numberofpoints {
         id object = [points objectAtIndex:i];            
         NSPoint point = [object pointValue];
 
-        // NSLog(@"=============>>>>> %@", NSStringFromPoint(point));
-        // NSLog(@"=============>>>>> %d", numberofpoints);
+        if (debug) NSLog(@"=============>>>>> %@", NSStringFromPoint(point));
+        if (debug) NSLog(@"=============>>>>> %d", numberofpoints);
 
         [path lineToPoint:point];
     }

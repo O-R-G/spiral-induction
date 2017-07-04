@@ -4,14 +4,20 @@
 
 + (void) initialize {
 
-    instance = 0;
-    size = 4;
-    direction = 1;
-    cycles = 2.0;
+    instance = 0;                                   // this
+    size = 2;                                       // multiplier
+
+    // this should be passed to initialize when started
+    // or to init below
+    // size = ( (ScreenSaverView)[emdrView bounds].size.width / 500 );
+
+    direction = 1;                                  // counter | clockwise
+    cycles = 2.0;                                   // rotations
     points = [[NSMutableArray alloc] initWithCapacity:0];
 }
 
 - (id) init {
+
     self = [super init];
     if (self != nil) {
         instance++;

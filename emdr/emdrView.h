@@ -19,8 +19,9 @@
     int hour, minute, second;                    // time_t (click)
     int xCenter, yCenter;
     int numberofspirals, numberofpointsmax;
-    int rows, columns;
     int counter, direction;
+
+    int rows, columns, extrudes, offsetx, offsety, offsetz;
 
     float spiralsize;       // temp ** fix **
 
@@ -32,6 +33,7 @@
     NSColor *red, *green, *blue;        
 
     bool grid;              // draw spirals in a grid, otherwise l/r edges only
+    bool debug;              
 }
 
 // - (void) checkTime_nsdate;
