@@ -30,8 +30,9 @@
 
     // spiral
 
-    pointsmax = 30;                     // [64] [102] [128] [256]
-    spiral = [[Spiral alloc] init];
+    pointsmax = 30;                     
+    float spiralsize = [self bounds].size.width / 900;      // ** fix **
+    spiral = [[Spiral alloc] initWithSize: spiralsize];
     [spiral makeWithPoints: pointsmax clockwise: true];
     // spiralcounterclockwise = [[Spiral alloc] init];
     // [spiralcounterclockwise makeWithPoints: pointsmax clockwise: true];
@@ -80,9 +81,7 @@
     NSRectFill([self bounds]);                                  // clear screen
 
     NSBezierPath* spiralPath = [NSBezierPath bezierPath];
-    spiralPath = [self buildBezierPathFromPointsWithIndex: spiralPath 
-clockwise: true numberofpoints: counter indexstart: 0 indexdirection: 
-direction];
+    spiralPath = [self buildBezierPathFromPointsWithIndex: spiralPath clockwise: true numberofpoints: counter indexstart: 0 indexdirection: direction];
     [spiralPath setLineWidth:1.0];
     [green setStroke];
 
@@ -117,9 +116,9 @@ direction];
             [xform translateXBy: offsetz * extrudes yBy: -offsetz * extrudes];
             [xform set];
         }            
-
-        // reset column
             
+        // reset column
+
         [xform translateXBy: -offsetx * columns yBy: 0.0];
         [xform set];
     }
@@ -140,8 +139,7 @@ clockwise:(Boolean)clockwise numberofpoints:(int)numberofpoints indexstart:
     int index = indexstart;
     if (!indexstart) indexstart = 0;
     if (!indexdirection) indexdirection = 1;                    // 1 | -1
-    // indexdirection = 1;                    // force roll unroll
-    // int indexstop = indexstart + (numberofpoints * indexdirection);
+    indexdirection = 1;                    // force roll unroll
  
     id object = [points objectAtIndex:indexstart];
     NSPoint point = [object pointValue];
@@ -153,10 +151,7 @@ clockwise:(Boolean)clockwise numberofpoints:(int)numberofpoints indexstart:
         NSPoint point = [object pointValue];
         [path lineToPoint:point];
 
-        // catch out of range        
         // logic ** fix **
-        // maybe change direction when it gets to the end?
-        // but how is that redundant or not with counter?
     
         index+=indexdirection;
 

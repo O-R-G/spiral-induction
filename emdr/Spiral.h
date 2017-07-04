@@ -21,10 +21,10 @@ static inline CGFloat secondtodegree (CGFloat thissecond) {
 }
 
 + (void) initialize;
-- (id) init;
+- (id) initWithSize;
 - (NSMutableArray*) makeWithPoints;          
 - (NSMutableArray*) points;          
-- (int) size;
+- (float) size;
 - (int) direction;
 - (void) debug;
 
