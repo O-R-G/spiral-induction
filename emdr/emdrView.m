@@ -7,11 +7,13 @@
 //
 
 #import "emdrView.h"
+#import <Foundation/Foundation.h>
+#import "Spiral.m"
 
 @implementation emdrView
 
-- (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview 
-{
+- (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview {
+
     self = [super initWithFrame:frame isPreview:isPreview];
     if (self) 
         [self setAnimationTimeInterval:1/30.0];
@@ -23,12 +25,31 @@
     yCenter = ( [self bounds].size.height / 2 );
     rows = 8;
     columns = 10;
-    numberofpointsmax = 120; // [64] [102] [128] [256]
-    counter = 0;
-    direction = 1;
-    spiralsize = ( [self bounds].size.height / (columns*150) );     // hardcoded ** fix **
-    // spiralsize = 0.55; // [0.25] [0.35] [1.0]
+    numberofpointsmax = 30; // [64] [102] [128] [256]
     grid = true;
+    counter = 0;
+
+    // set drawing context
+
+    context = [NSGraphicsContext currentContext];
+    red = [NSColor colorWithRed: 1.0 green: 0.0 blue: 0.0 alpha: 1.0];
+    green = [NSColor colorWithRed: 0.25 green: 0.75 blue: 0.0 alpha: 1.0];
+    blue = [NSColor colorWithRed: 0.0 green: 0.0 blue: 1.0 alpha: 1.0];
+
+    // build spiral
+
+    spiral = [[Spiral alloc] init];
+    [spiral makeWithPoints: numberofpointsmax clockwise: false];
+
+    // spiralsize = [spiral size];
+    direction = [spiral direction];    
+    // NSMutableArray* points = [spiral points];
+    points = [spiral points];
+    NSLog(@"points[2] -------------> : %@", [points objectAtIndex:2]);
+    // NSLog(@"thispoints[2] -------------> : %@", [[spiral points] objectAtIndex:2]);
+
+    // [spiral debug];
+
     return self;
 }
 
@@ -46,35 +67,16 @@
 
 - (void)animateOneFrame {
 
-    // using cocoa drawing (NS) (a superset of quartz 2d (CG))
-
-    NSGraphicsContext* context = [NSGraphicsContext currentContext];
-
-    [self checkTime_nsdate]; // system time milliseconds (CGFloat) sweep
-
-    NSColor* yellow = [NSColor colorWithRed: 1.0 green: 1.0 blue: 0.0 alpha: 1.0];
-    NSColor* green = [NSColor colorWithRed: 0.25 green: 0.75 blue: 0.0 alpha: 1.0];
-    NSColor* red = [NSColor colorWithRed: 1.0 green: 0.0 blue: 0.0 alpha: 1.0];
-    NSColor* blue = [NSColor colorWithRed: 0.0 green: 0.0 blue: 1.0 alpha: 1.0];
-        
     [[NSColor blackColor] set];
     NSRectFill([self bounds]);
     
-    // spirals
-    // better to just make a spiral object? with properties?
-    // could also "animate" the spiral in the build method, like an update using a counter
     // best fit bezier from points?
     // http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/
 
-    // ** fix ** paths should be initialized once and then updated
-    // perhaps 2d array of arrays of points per to keep track or just a pointer of where in array to draw to
-
-    NSBezierPath* spiralLeft = [NSBezierPath bezierPath];
-    NSBezierPath* spiralRight = [NSBezierPath bezierPath];
-    NSBezierPath* spiralDouble = [NSBezierPath bezierPath];
-    spiralLeft = [self buildBezierSpiralWithPath: spiralLeft clockwise: true drawBezierPoints: false numberofpoints: counter];
-    spiralRight = [self buildBezierSpiralWithPath: spiralRight clockwise: false drawBezierPoints: false numberofpoints: numberofpointsmax - counter];
-    spiralDouble = [self buildBezierDoubleSpiralWithPath: spiralDouble clockwise: true drawBezierPoints: true numberofpoints: counter];
+    // NSBezierPath* spiralDouble = [NSBezierPath bezierPath];
+    // spiralDouble = [self buildBezierDoubleSpiralWithPath: spiralDouble clockwise: true drawBezierPoints: true numberofpoints: counter];
+    NSBezierPath* spiralSingle = [NSBezierPath bezierPath];
+    spiralSingle = [self buildBezierPathFromPoints: spiralSingle clockwise: true numberofpoints: counter];
 
     // draw
  
@@ -86,87 +88,80 @@
 
     NSAffineTransform* xform = [NSAffineTransform transform]; // identity transform (ground state)
 
-    [spiralLeft setLineWidth:1.0];
-    [spiralRight setLineWidth:1.0];
-    [spiralDouble setLineWidth:1.0];
+    // 0. draw one spiral in screen center
+
     [green setStroke];
+    // [spiralSingle setLineWidth:1.0];
+    [spiralSingle setLineWidth:2.0];
 
-    /*
-    // debug
-    if (counter >= numberofpointsmax / 2) 
-        [red setStroke];
-    else 
-        [green setStroke];
-    */
-
-
-    // 0. ignore grid, draw only one spiral in screen center
-
-    [xform translateXBy: [self bounds].size.width/2 yBy: [self bounds].size.height/2];
+    // [xform translateXBy: [self bounds].size.width/2 yBy: [self bounds].size.height/2];
+    [xform translateXBy: 0 yBy: -100.0];
     [xform set];
 
-    [spiralDouble stroke];
+    // 1. repeat / extrude 
 
+    int extrude = 80;
+    int offset = 16;    // [16]
+    int columns = 10;
+    int xoffset = 240;
 
-    /*
-    // 1. offset x, y to draw grid of spirals from centers based on screen width, height
-        
-    [xform translateXBy:-[self bounds].size.width/columns/2 yBy:-[self bounds].size.height/rows/2];
-    [xform set];
+    for (int x = 0; x < columns; x++) {
 
-    // columns
-
-    for (int j = 0; j < columns; j++) {
-  
-        // rows (spiralRight)
-            
-        [xform translateXBy:[self bounds].size.width/columns yBy: 0.0];                 // shift x
+        [xform translateXBy: xoffset yBy: 0];
         [xform set];
 
-        for (int i = 0; i < rows; i++) {
-            [xform translateXBy:0.0 yBy:[self bounds].size.height/rows];             // shift y
+        for (int i = 0; i < extrude; i++) {
+            [xform translateXBy: -offset yBy: offset];
             [xform set];
-            [spiralRight stroke];
+            [spiralSingle stroke];
         }
 
-        // if edgesonly then increment j a lot and translate x a lot
-
-        [xform translateXBy:0.0 yBy: -[self bounds].size.height];                       // reset y
-            [xform set];
-
-        // rows (spiralLeft)
-
-        [xform translateXBy:[self bounds].size.width/columns yBy: 0.0];                 // shift x
-        if (!grid) 
-            [xform translateXBy:[self bounds].size.width/columns*8 yBy: 0.0];           // shift x to edge
-                                                                                        // hardcoded, ** fix **
+        [xform translateXBy: extrude * offset yBy: -extrude * offset];
         [xform set];
- 
-        for (int i = 0; i < rows; i++) {
-            [xform translateXBy:0.0 yBy:[self bounds].size.height/rows];                // shift y
-            [xform set];
-            [spiralLeft stroke];
-        }
-
-        [xform translateXBy:0.0 yBy: -[self bounds].size.height];                       // reset y
-        [xform set];
-
-        if (!grid) 
-            j = columns;                                                                // exit loop
     }
-    */
 
-    // wind up, wind down
+    // 1. wind up / wind down
 
     counter += direction;
     if (counter >= numberofpointsmax || counter <= 0) direction *= -1;
-
-    [context flushGraphics]; // necessary?
 }
 
-// spirals
+
+
+
+// bezier paths
 
 // single 
+
+- (NSBezierPath*)buildBezierPathFromPoints:(NSBezierPath*)path clockwise:(Boolean)clockwise 
+numberofpoints:(int)numberofpoints {
+
+    int spiraldirection = 1;
+    if (!clockwise) spiraldirection = -1;
+
+    [path moveToPoint:NSMakePoint(0.0, 0.0)];
+
+    NSLog(@"=============>>>>> %d", numberofpoints);
+
+    // for (int i = 0; i < [points count]; i++) {
+    for (int i = 0; i < numberofpoints; i++) {
+
+        id object = [points objectAtIndex:i];            
+        NSPoint point = [object pointValue];
+        // NSLog(@"=============>>>>> %@", NSStringFromPoint(point));
+
+        [path lineToPoint:point];
+    }
+
+    return path;
+}
+
+
+
+
+
+/* 
+// old tmp ** fix ** delete
 
 - (NSBezierPath*)buildBezierSpiralWithPath:(NSBezierPath*)thisPath clockwise:(Boolean)clockwise 
 drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
@@ -192,6 +187,7 @@ drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
 
     return thisPath;
 }
+*/
 
 // double
 
@@ -298,53 +294,66 @@ drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
     return thisPath;
 }
 
-- (void) checkTime_nsdate {
-    // get current time in milliseconds
-    
-    NSDate *now = [NSDate date];
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    formatter.dateFormat = @"hh:mm:ss.SSS";
-    NSString *string = [formatter stringFromDate: now];
-    NSArray *timeComponents = [string componentsSeparatedByString:@":"];
-    
-    NSInteger hr = [timeComponents[0] integerValue];
-    NSInteger min = [timeComponents[1] integerValue];
-    sweepsecond = [timeComponents[2] floatValue];
-    sweepminute = min + (sweepsecond / 60.0);
-    sweephour = hr + (sweepminute / 60.0);
-    
-    return;
-}
 
-- (void)debugText:(CGFloat)xPosition yPosition:(CGFloat)yPosition canvasWidth:(CGFloat)canvasWidth canvasHeight:(CGFloat)canvasHeight {
 
-    //Draw Text
-    CGRect textRect0 = CGRectMake(xPosition, yPosition, canvasWidth, canvasHeight);
-    CGRect textRect1 = CGRectMake(xPosition, yPosition-12, canvasWidth, canvasHeight);
-    CGRect textRect2 = CGRectMake(xPosition, yPosition-24, canvasWidth, canvasHeight);
-    NSMutableParagraphStyle* textStyle = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
-    textStyle.alignment = NSTextAlignmentLeft;
-    NSDictionary* textFontAttributes = @{NSFontAttributeName: [NSFont fontWithName: @"Courier New" size: 12], 
-    NSForegroundColorAttributeName: NSColor.redColor, NSParagraphStyleAttributeName: textStyle};
-    
-    NSString *debug0 = [NSString stringWithFormat: @"0 : %f", sweephour];
-    NSString *debug1 = [NSString stringWithFormat: @"1 : %f", sweepminute];
-    NSString *debug2 = [NSString stringWithFormat: @"2 : %f", sweepsecond];
-    
+
+
+- (void)makeGrid {
+
+    // in development
+
     /*
-     // output to log
-     
-     NSLog(@"====================================================================");
-     NSLog(@"h: %f", sweephour);
-     NSLog(@"m: %f", sweepminute);
-     NSLog(@"s %f", sweepsecond);
-     NSLog(@"====================================================================");
-     */
-    
-    [debug0 drawInRect: textRect0 withAttributes: textFontAttributes];
-    [debug1 drawInRect: textRect1 withAttributes: textFontAttributes];
-    [debug2 drawInRect: textRect2 withAttributes: textFontAttributes];
+
+    // move this out to separate function?
+    // 1. offset x, y to draw grid of spirals from centers based on screen width, height
+        
+    [xform translateXBy:-[self bounds].size.width/columns/2 yBy:-[self bounds].size.height/rows/2];
+    [xform set];
+
+    // columns
+
+    for (int j = 0; j < columns; j++) {
+  
+        // rows (spiralRight)
+            
+        [xform translateXBy:[self bounds].size.width/columns yBy: 0.0];                 // shift x
+        [xform set];
+
+        for (int i = 0; i < rows; i++) {
+            [xform translateXBy:0.0 yBy:[self bounds].size.height/rows];             // shift y
+            [xform set];
+            [spiralRight stroke];
+        }
+
+        // if edgesonly then increment j a lot and translate x a lot
+
+        [xform translateXBy:0.0 yBy: -[self bounds].size.height];                       // reset y
+            [xform set];
+
+        // rows (spiralLeft)
+
+        [xform translateXBy:[self bounds].size.width/columns yBy: 0.0];                 // shift x
+        if (!grid) 
+            [xform translateXBy:[self bounds].size.width/columns*8 yBy: 0.0];           // shift x to edge
+                                                                                        // hardcoded, ** fix **
+        [xform set];
+ 
+        for (int i = 0; i < rows; i++) {
+            [xform translateXBy:0.0 yBy:[self bounds].size.height/rows];                // shift y
+            [xform set];
+            [spiralLeft stroke];
+        }
+
+        [xform translateXBy:0.0 yBy: -[self bounds].size.height];                       // reset y
+        [xform set];
+
+        if (!grid) 
+            j = columns;                                                                // exit loop
+    }
+    */
 }
+
+
 
 - (BOOL)hasConfigureSheet {
     return NO;
