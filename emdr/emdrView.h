@@ -9,34 +9,25 @@
 #import <ScreenSaver/ScreenSaver.h>
 #import "Spiral.h"
 
-@interface emdrView : ScreenSaverView
-{
-    // Instance (global) variables
+@interface emdrView : ScreenSaverView {
+
+    // globals
     
-    // double radius, second;
-    CGFloat radius;
-    CGFloat sweephour, sweepminute, sweepsecond;    // NSDate (sweep)
-    int hour, minute, second;                    // time_t (click)
-    int xCenter, yCenter;
-    int numberofspirals, numberofpointsmax;
     int counter, direction;
-
     int rows, columns, extrudes, offsetx, offsety, offsetz;
+    int numberofpointsmax;
 
-    float spiralsize;       // temp ** fix **
+    // objects
 
-    // objects 
     Spiral* spiral;
     NSMutableArray* points;
-
     NSGraphicsContext *context;
     NSColor *red, *green, *blue;        
 
-    bool grid;              // draw spirals in a grid, otherwise l/r edges only
+    // utility
+
     bool debug;              
 }
-
-// - (void) checkTime_nsdate;
 
 @end
 
