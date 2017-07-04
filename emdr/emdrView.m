@@ -30,10 +30,10 @@
 
     // spiral
 
-    numberofpointsmax = 30;                     // [64] [102] [128] [256]
+    pointsmax = 30;                     // [64] [102] [128] [256]
     spiral = [[Spiral alloc] init];
-    [spiral makeWithPoints: numberofpointsmax clockwise: false];
-    direction = [spiral direction];    
+    [spiral makeWithPoints: pointsmax clockwise: false];
+    direction = [spiral direction];  
     points = [spiral points];
 
     // grid
@@ -47,7 +47,7 @@
 
     // utility
 
-    debug = false;
+    debug = true;
     counter = 0;
 
     if (debug) [spiral debug];
@@ -77,9 +77,12 @@
 
     NSRectFill([self bounds]);                                  // clear screen
 
-    NSBezierPath* spiralSingle = [NSBezierPath bezierPath];
-    spiralSingle = [self buildBezierPathFromPoints: spiralSingle clockwise: true numberofpoints: counter];
-    [spiralSingle setLineWidth:1.0];
+    NSBezierPath* spiralPath = [NSBezierPath bezierPath];
+    // spiralPath = [self buildBezierPathFromPoints: spiralPath clockwise: true numberofpoints: counter];
+    spiralPath = [self buildBezierPathFromPointsWithIndex: spiralPath 
+clockwise: true numberofpoints: counter indexstart: 10 indexdirection: 
+direction];
+    [spiralPath setLineWidth:1.0];
     [green setStroke];
 
     NSAffineTransform* xform = [NSAffineTransform transform];   // identity
@@ -105,7 +108,7 @@
 
                 [xform translateXBy: -offsetz yBy: offsetz];
                 [xform set];
-                [spiralSingle stroke];
+                [spiralPath stroke];
             }
             
             // reset extrude
@@ -123,33 +126,48 @@
     // wind up / down
 
     counter += direction;
-    if (counter >= numberofpointsmax || counter <= 0) direction *= -1;
-    if (debug) counter = numberofpointsmax;
+    if (counter >= pointsmax || counter <= 0) direction *= -1;
+    // if (debug) counter = pointsmax;
 }
 
 // bezier paths
 
-- (NSBezierPath*)buildBezierPathFromPoints:(NSBezierPath*)path 
-clockwise:(Boolean)clockwise numberofpoints:(int)numberofpoints {
+- (NSBezierPath*)buildBezierPathFromPointsWithIndex:(NSBezierPath*)path 
+clockwise:(Boolean)clockwise numberofpoints:(int)numberofpoints indexstart: 
+(int)indexstart indexdirection:(int)indexdirection {
     
-    // add function to only draw part of curve, beginning and ending parameters
-    // which point to points[]
-
-    int spiraldirection = 1;
-    if (!clockwise) spiraldirection = -1;
-
-    [path moveToPoint:NSMakePoint(0.0, 0.0)];
-
+    int index = indexstart;
+    if (!indexstart) indexstart = 0;
+    if (!indexdirection) indexdirection = 1;                    // 1 | -1
+    // int indexstop = indexstart + (numberofpoints * indexdirection);
+ 
+    id object = [points objectAtIndex:indexstart];
+    NSPoint point = [object pointValue];
+    [path moveToPoint:point];
+ 
     for (int i = 0; i < numberofpoints; i++) {
 
-        id object = [points objectAtIndex:i];            
+        id object = [points objectAtIndex:index];
         NSPoint point = [object pointValue];
-
-        if (debug) NSLog(@"=============>>>>> %@", NSStringFromPoint(point));
-        if (debug) NSLog(@"=============>>>>> %d", numberofpoints);
-
         [path lineToPoint:point];
+
+        // catch out of range        
+        // logic ** fix **
+        // maybe change direction when it gets to the end?
+        // but how is that redundant or not with counter?
+    
+        index+=indexdirection;
+
+        if (index > [points count] - 1) index = [points count] -1;
+        else if (index < 0) index = 0;
+
+        if (debug) NSLog(@"i : %d", i);
+        if (debug) NSLog(@"index : %d", index);
+        // if (debug) NSLog(@"point ==>> %@", NSStringFromPoint(point));
+        // if (debug) NSLog(@"numberofpoints =>> %d", numberofpoints);
     }
+
+    if (debug) NSLog(@"------------------------------------");
 
     return path;
 }

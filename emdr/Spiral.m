@@ -26,7 +26,7 @@
     return self;
 }
 
-- (id) makeWithPoints: (int) number clockwise:(Boolean)clockwise {
+- (id) makeWithPoints: (int)number clockwise:(Boolean)clockwise {
 
     // populate
     // cycles = turns around the center

@@ -15,7 +15,7 @@
     
     int counter, direction;
     int rows, columns, extrudes, offsetx, offsety, offsetz;
-    int numberofpointsmax;
+    int pointsmax;
 
     // objects
 
