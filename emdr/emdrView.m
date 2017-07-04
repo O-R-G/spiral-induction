@@ -32,7 +32,9 @@
 
     pointsmax = 30;                     // [64] [102] [128] [256]
     spiral = [[Spiral alloc] init];
-    [spiral makeWithPoints: pointsmax clockwise: false];
+    [spiral makeWithPoints: pointsmax clockwise: true];
+    // spiralcounterclockwise = [[Spiral alloc] init];
+    // [spiralcounterclockwise makeWithPoints: pointsmax clockwise: true];
     direction = [spiral direction];  
     points = [spiral points];
 
@@ -137,8 +139,8 @@ clockwise:(Boolean)clockwise numberofpoints:(int)numberofpoints indexstart:
     
     int index = indexstart;
     if (!indexstart) indexstart = 0;
-    // if (!indexdirection) indexdirection = 1;                    // 1 | -1
-    indexdirection = 1;                    // 1 | -1
+    if (!indexdirection) indexdirection = 1;                    // 1 | -1
+    // indexdirection = 1;                    // force roll unroll
     // int indexstop = indexstart + (numberofpoints * indexdirection);
  
     id object = [points objectAtIndex:indexstart];

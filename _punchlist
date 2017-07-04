@@ -2,9 +2,9 @@
 + grid
 + grid fix hardcoding
 + buildBezierPathFromPointsWithIndex add
-- bezier path direction parameter
++ bezier path direction parameter
++ draw / erase spiral
 - counter - direction / index - indexdirection logic
-- draw / erase spiral
 / spiral dynamic sizing
 - smooth line thru bezier points
   http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/

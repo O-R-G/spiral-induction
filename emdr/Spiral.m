@@ -35,6 +35,7 @@
 
         CGPoint p;
         CGFloat radian = mapValueWithRange(i, 0.0, number, 0.0, (2 * PI) * cycles);
+        if (clockwise) radian*=-1; 
 
         float x = i * size * cos(radian);
         float y = i * size * sin(radian);

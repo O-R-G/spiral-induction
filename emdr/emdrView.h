@@ -19,7 +19,8 @@
 
     // objects
 
-    Spiral* spiral;
+    Spiral* spiral; 
+    // Spiral* spiralcounterclockwise;
     NSMutableArray* points;
     NSGraphicsContext *context;
     NSColor *red, *green, *blue;        
