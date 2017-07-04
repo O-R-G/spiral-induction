@@ -67,9 +67,6 @@
 
     [[NSColor blackColor] set];
     NSRectFill([self bounds]);
-    
-    // best fit bezier from points?
-    // http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/
 
     NSBezierPath* spiralSingle = [NSBezierPath bezierPath];
     spiralSingle = [self buildBezierPathFromPoints: spiralSingle clockwise: true numberofpoints: counter];
@@ -84,48 +81,67 @@
 
     NSAffineTransform* xform = [NSAffineTransform transform]; // identity transform (ground state)
 
-    // 0. draw one spiral in screen center
-
     [green setStroke];
     [spiralSingle setLineWidth:1.0];
 
-    // 1. extrude, arrange
-
-    int extrude = 60;
-    int offset = 16;    // [16]
-    int columns = 10;
-    int rows = 5;
-    int offsetx = 240;
-    int offsety = 100;
+    int extrudes = 40;
+    int columns = 5;
+    int rows = 4;
+    int offsetx = 200;
+    int offsety = 200;
+    int offsetz = 10; // [16]
 
     // [xform translateXBy: [self bounds].size.width/2 yBy: [self bounds].size.height/2];
-    // [xform translateXBy: 0 yBy: 400.0];
-    // [xform set];
+    [xform translateXBy: 0 yBy: -100.0];
+    [xform set];
 
-    for (int y = 0; y < rows; y++) {
+    for (int y = 0; y < rows; y++) {                
 
-        // rows not working yet
+        // row
 
-        for (int x = 0; x < columns; x++) {
+        [xform translateXBy: 0 yBy: offsety];
+        [xform set];
+
+        for (int x = 0; x < columns; x++) {         
+
+            // column
 
             [xform translateXBy: offsetx yBy: 0];
             [xform set];
 
-            for (int i = 0; i < extrude; i++) {
-                [xform translateXBy: -offset yBy: offset];
+            for (int i = 0; i < extrudes; i++) {
+
+                // extrude
+
+                [xform translateXBy: -offsetz yBy: offsetz];
                 [xform set];
                 [spiralSingle stroke];
             }
+            
+            // reset extrude
 
-            [xform translateXBy: extrude * offset yBy: -extrude * offset];
+            // [xform invert];
+
+            [xform translateXBy: offsetz * extrudes yBy: -offsetz * extrudes];
             [xform set];
         }            
+
+        // reset column
+            
+        // [xform translateXBy: -offsetx * columns + 40 yBy: 0];
+        // [xform translateXBy: -offsetx * columns + offsetz * columns yBy: 0];
+        [xform translateXBy: -offsetx * columns yBy: 0];
+        [xform set];
+
+        // no need to reset row
     }
 
     // 1. wind up / wind down
 
     counter += direction;
     if (counter >= numberofpointsmax || counter <= 0) direction *= -1;
+
+    counter = numberofpointsmax;        // static ** debug **
 }
 
 
@@ -133,30 +149,35 @@
 
 // bezier paths
 
-// single 
+// single
 
 - (NSBezierPath*)buildBezierPathFromPoints:(NSBezierPath*)path clockwise:(Boolean)clockwise 
 numberofpoints:(int)numberofpoints {
+    
+    // add function to only draw part of curve, beginning and ending parameters
+    // which point to points[]
 
     int spiraldirection = 1;
     if (!clockwise) spiraldirection = -1;
 
     [path moveToPoint:NSMakePoint(0.0, 0.0)];
 
-    // NSLog(@"=============>>>>> %d", numberofpoints);
-
-    // for (int i = 0; i < [points count]; i++) {
     for (int i = 0; i < numberofpoints; i++) {
 
         id object = [points objectAtIndex:i];            
         NSPoint point = [object pointValue];
+
         // NSLog(@"=============>>>>> %@", NSStringFromPoint(point));
+        // NSLog(@"=============>>>>> %d", numberofpoints);
 
         [path lineToPoint:point];
     }
 
     return path;
 }
+
+
+
 
 
 
