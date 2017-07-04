@@ -23,8 +23,6 @@
     radius = ( [self bounds].size.width / 5 );
     xCenter = ( [self bounds].size.width / 2 );
     yCenter = ( [self bounds].size.height / 2 );
-    rows = 8;
-    columns = 10;
     numberofpointsmax = 30; // [64] [102] [128] [256]
     grid = true;
     counter = 0;
@@ -45,7 +43,7 @@
     direction = [spiral direction];    
     // NSMutableArray* points = [spiral points];
     points = [spiral points];
-    NSLog(@"points[2] -------------> : %@", [points objectAtIndex:2]);
+    // NSLog(@"points[2] -------------> : %@", [points objectAtIndex:2]);
     // NSLog(@"thispoints[2] -------------> : %@", [[spiral points] objectAtIndex:2]);
 
     // [spiral debug];
@@ -73,8 +71,6 @@
     // best fit bezier from points?
     // http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/
 
-    // NSBezierPath* spiralDouble = [NSBezierPath bezierPath];
-    // spiralDouble = [self buildBezierDoubleSpiralWithPath: spiralDouble clockwise: true drawBezierPoints: true numberofpoints: counter];
     NSBezierPath* spiralSingle = [NSBezierPath bezierPath];
     spiralSingle = [self buildBezierPathFromPoints: spiralSingle clockwise: true numberofpoints: counter];
 
@@ -91,33 +87,39 @@
     // 0. draw one spiral in screen center
 
     [green setStroke];
-    // [spiralSingle setLineWidth:1.0];
-    [spiralSingle setLineWidth:2.0];
+    [spiralSingle setLineWidth:1.0];
 
-    // [xform translateXBy: [self bounds].size.width/2 yBy: [self bounds].size.height/2];
-    [xform translateXBy: 0 yBy: -100.0];
-    [xform set];
+    // 1. extrude, arrange
 
-    // 1. repeat / extrude 
-
-    int extrude = 80;
+    int extrude = 60;
     int offset = 16;    // [16]
     int columns = 10;
-    int xoffset = 240;
+    int rows = 5;
+    int offsetx = 240;
+    int offsety = 100;
 
-    for (int x = 0; x < columns; x++) {
+    // [xform translateXBy: [self bounds].size.width/2 yBy: [self bounds].size.height/2];
+    // [xform translateXBy: 0 yBy: 400.0];
+    // [xform set];
 
-        [xform translateXBy: xoffset yBy: 0];
-        [xform set];
+    for (int y = 0; y < rows; y++) {
 
-        for (int i = 0; i < extrude; i++) {
-            [xform translateXBy: -offset yBy: offset];
+        // rows not working yet
+
+        for (int x = 0; x < columns; x++) {
+
+            [xform translateXBy: offsetx yBy: 0];
             [xform set];
-            [spiralSingle stroke];
-        }
 
-        [xform translateXBy: extrude * offset yBy: -extrude * offset];
-        [xform set];
+            for (int i = 0; i < extrude; i++) {
+                [xform translateXBy: -offset yBy: offset];
+                [xform set];
+                [spiralSingle stroke];
+            }
+
+            [xform translateXBy: extrude * offset yBy: -extrude * offset];
+            [xform set];
+        }            
     }
 
     // 1. wind up / wind down
@@ -141,7 +143,7 @@ numberofpoints:(int)numberofpoints {
 
     [path moveToPoint:NSMakePoint(0.0, 0.0)];
 
-    NSLog(@"=============>>>>> %d", numberofpoints);
+    // NSLog(@"=============>>>>> %d", numberofpoints);
 
     // for (int i = 0; i < [points count]; i++) {
     for (int i = 0; i < numberofpoints; i++) {
