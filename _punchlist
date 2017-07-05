@@ -5,8 +5,9 @@
 + bezier path direction parameter
 + draw / erase spiral
 + spiral dynamic sizing
-- spiralsize hardcoding fix in emdrView.m
-- alternate directions of spiraling?
++ sizer hardcoding fix in emdrView.m
++ sizer parameter passing debug
+- implement individual spiral directions 
 - counter - direction / index - indexdirection logic
 - smooth line thru bezier points
   http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/

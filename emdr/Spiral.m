@@ -5,18 +5,18 @@
 + (void) initialize {
 
     instance = 0;                       
-    size = 1.0;                         
+    sizer = 1.0;                         
     direction = 1;                  // counter | clockwise
     cycles = 2.0;                   // rotations
     points = [[NSMutableArray alloc] initWithCapacity:0];
 }
 
-- (id) initWithSize: (float)spiralsize {
+- (id) initWithSize: (float)thissizer {
 
     self = [super init];
     if (self != nil) {
         instance++;
-        size = spiralsize;                         
+        sizer = thissizer;
     }    
 
     return self;
@@ -33,8 +33,8 @@
         CGFloat radian = mapValueWithRange(i, 0.0, number, 0.0, (2 * PI) * cycles);
         if (clockwise) radian*=-1; 
 
-        float x = i * size * cos(radian);
-        float y = i * size * sin(radian);
+        float x = i * sizer * cos(radian);
+        float y = i * sizer * sin(radian);
         p.x = x;
         p.y = y;
 
@@ -49,9 +49,9 @@
     return points;
 }
 
-- (int) size {
+- (float) sizer {
 
-    return size;
+    return sizer;
 }
 
 - (int) direction {
@@ -69,7 +69,7 @@
 - (void) debug {
 
     NSLog(@"instance : %d", instance);
-    NSLog(@"size : %d", size);
+    NSLog(@"sizer : %d", sizer);
     NSLog(@"direction : %d", direction);
     NSLog(@"cycles : %d", cycles);
     NSLog(@"points : %@", points);

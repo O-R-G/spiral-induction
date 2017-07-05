@@ -31,8 +31,8 @@
     // spiral
 
     pointsmax = 30;                     
-    float spiralsize = [self bounds].size.width / 900;      // ** fix **
-    spiral = [[Spiral alloc] initWithSize: spiralsize];
+    float sizer = [self bounds].size.width * .001;      
+    spiral = [[Spiral alloc] initWithSize: sizer];
     [spiral makeWithPoints: pointsmax clockwise: true];
     // spiralcounterclockwise = [[Spiral alloc] init];
     // [spiralcounterclockwise makeWithPoints: pointsmax clockwise: true];
