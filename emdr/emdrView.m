@@ -47,7 +47,7 @@
     extrudes = 15;
     offsetx = [self bounds].size.width / (columns + 1);     // between columns
     offsety = [self bounds].size.height / (rows + 1);       // between rows
-    offsetz = 4;                                            // between extrudes
+    offsetz = [self bounds].size.height / (rows + 1) / 30;  // between extrudes
 
     // utility
 

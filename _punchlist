@@ -22,16 +22,10 @@ x double spiral constructor
 x add non-linear movement to spiral dwg
 x indexstarter
 + counter - direction / index - indexdirection logic
-
-- icons
-- preview
-- build, codesign, post
++ icons
++ preview
++ build, codesign, post (see _notes.txt)
   version w/ 2 spirals 
   version w/ 3 spirals 
-  version w/ 2 spirals bigger at 1.5
- 
-- description
-
-xcodebuild -scheme emdr build; cp -rf /Users/reinfurt/Library/Developer/Xcode/DerivedData/emdr-fngoisxcmikmcscjioumllgspeun/Build/Products/Debug/emdr.saver /Users/reinfurt/Library/Screen\ Savers/; open /System/Library/Frameworks/ScreenSaver.framework/Resources/ScreenSaverEngine.app
-
-
+  version w/ 2 spirals bigger at 1.5 
++ description
