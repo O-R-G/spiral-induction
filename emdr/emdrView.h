@@ -13,21 +13,19 @@
 
     // globals
     
+    int pointsmax;
     int counter, direction;
     int rows, columns, extrudes, offsetx, offsety, offsetz;
-    int pointsmax;
-
+    double millis, thismillis, lastmillis, millissinceupdate;
+    double timerstep;
+    bool debug;              
+ 
     // objects
 
     Spiral* spiral; 
-    // Spiral* spiralcounterclockwise;
     NSMutableArray* points;
     NSGraphicsContext *context;
     NSColor *red, *green, *blue;        
-
-    // utility
-
-    bool debug;              
 }
 
 @end

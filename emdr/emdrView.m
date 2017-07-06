@@ -21,8 +21,10 @@
         [self setAnimationTimeInterval:1/30.0];
 
     // graphics context
+    // using cocoa drawing (NS) (a superset of quartz 2d (CG))
 
     context = [NSGraphicsContext currentContext];
+    // [NSBezierPath setDefaultFlatness: 10.0];
     red = [NSColor colorWithRed: 1.0 green: 0.0 blue: 0.0 alpha: 1.0];
     green = [NSColor colorWithRed: 0.25 green: 0.75 blue: 0.0 alpha: 1.0];
     blue = [NSColor colorWithRed: 0.0 green: 0.0 blue: 1.0 alpha: 1.0];
@@ -30,12 +32,11 @@
 
     // spiral
 
-    pointsmax = 30;                     
-    float sizer = [self bounds].size.width * .001;      
+    pointsmax = 30;
+    float scaler = .001;
+    float sizer = [self bounds].size.width * scaler;
     spiral = [[Spiral alloc] initWithSize: sizer];
     [spiral makeWithPoints: pointsmax clockwise: false];
-    // spiralcounterclockwise = [[Spiral alloc] init];
-    // [spiralcounterclockwise makeWithPoints: pointsmax clockwise: true];
     direction = [spiral direction];  
     points = [spiral points];
 
@@ -50,7 +51,8 @@
 
     // utility
 
-    debug = true;
+    timerstep = 50.0;                                       // millis (max speed)
+    debug = false;
     counter = 0;
 
     if (debug) [spiral debug];
@@ -76,61 +78,77 @@
 
 - (void)animateOneFrame {
 
-    // draw
+    // update?
 
-    NSRectFill([self bounds]);                                  // clear screen
+    lastmillis = thismillis;
+    thismillis = [self millis];
+    double elapsedmillis = thismillis - lastmillis;
+    if (elapsedmillis < timerstep) millissinceupdate += elapsedmillis;
+    else millissinceupdate = elapsedmillis;
 
-    NSBezierPath* spiralPath = [NSBezierPath bezierPath];
-    spiralPath = [self buildBezierPathFromPointsWithIndex: spiralPath clockwise: false numberofpoints: counter indexstart: 0 indexdirection: direction];
-    [spiralPath setLineWidth:1.0];
-    [green setStroke];
+    // draw 
 
-    NSAffineTransform* xform = [NSAffineTransform transform];   // identity
-    [xform translateXBy: 0.0 yBy: -offsety / 3];                // adjust
+    if (millissinceupdate > timerstep) {
 
-    for (int y = 0; y < rows; y++) {
+        NSRectFill([self bounds]);                  // clear screen
 
-        // row
+        NSBezierPath* spiralPath = [NSBezierPath bezierPath];
+        spiralPath = [self buildBezierPathFromPointsWithIndex: spiralPath 
+clockwise: false numberofpoints: counter indexstart: 0 indexdirection: 
+direction];
+        [spiralPath setLineWidth:1.0];
+        [green setStroke];
 
-        [xform translateXBy: 0.0 yBy: offsety];
-        [xform set];
+        NSAffineTransform* xform = [NSAffineTransform transform];   // identity
+        [xform translateXBy: 0.0 yBy: -offsety / 3];                // adjust
 
-        for (int x = 0; x < columns; x++) {         
+        for (int y = 0; y < rows; y++) {
 
-            // column
+            // row
 
-            [xform translateXBy: offsetx yBy: 0.0];
+            [xform translateXBy: 0.0 yBy: offsety];
             [xform set];
 
-            for (int i = 0; i < extrudes; i++) {
+            for (int x = 0; x < columns; x++) {         
 
-                // extrude
+                // column
 
-                [xform translateXBy: -offsetz yBy: offsetz];
+                [xform translateXBy: offsetx yBy: 0.0];
                 [xform set];
-                [spiralPath stroke];
-            }
-            
-            // reset extrude
 
-            [xform translateXBy: offsetz * extrudes yBy: -offsetz * extrudes];
+                for (int i = 0; i < extrudes; i++) {
+
+                    // extrude
+
+                    [xform translateXBy: -offsetz yBy: offsetz];
+                    [xform set];
+                    [spiralPath stroke];
+                }
+            
+                // reset extrude
+
+                [xform translateXBy: offsetz * extrudes yBy: -offsetz * extrudes];
+                [xform set];
+            }            
+            
+            // reset column
+
+            [xform translateXBy: -offsetx * columns yBy: 0.0];
             [xform set];
-        }            
-            
-        // reset column
+        }
 
-        [xform translateXBy: -offsetx * columns yBy: 0.0];
-        [xform set];
+        // wind up / down
+
+        counter += direction;
+        if (counter >= pointsmax || counter <= 0) direction *= -1;
+
+        millissinceupdate = 0;
     }
-
-    // wind up / down
-
-    counter += direction;
-    if (counter >= pointsmax || counter <= 0) direction *= -1;
-    // if (debug) counter = pointsmax;
 }
 
-// bezier paths
+
+
+/* bezier paths */
 
 - (NSBezierPath*)buildBezierPathFromPointsWithIndex:(NSBezierPath*)path 
 clockwise:(Boolean)clockwise numberofpoints:(int)numberofpoints indexstart: 
@@ -138,33 +156,26 @@ clockwise:(Boolean)clockwise numberofpoints:(int)numberofpoints indexstart:
     
     int index = indexstart;
     if (!indexstart) indexstart = 0;
-    if (!indexdirection) indexdirection = 1;                    // 1 | -1
-    indexdirection = 1;                    // force roll unroll
+    if (!indexdirection) indexdirection = 1;            // 1 | -1
+    indexdirection = 1;                              // force roll unroll
  
+    numberofpoints = numberofpoints - indexstart;
+
     id object = [points objectAtIndex:indexstart];
     NSPoint point = [object pointValue];
-    [path moveToPoint:point];
- 
+    [path moveToPoint:point];                           // 0,0
+
     for (int i = 0; i < numberofpoints; i++) {
 
         id object = [points objectAtIndex:index];
         NSPoint point = [object pointValue];
         [path lineToPoint:point];
-
-        // logic ** fix **
     
         index+=indexdirection;
 
         if (index > [points count] - 1) index = [points count] -1;
-        else if (index < 0) index = 0;
-
-        if (debug) NSLog(@"i : %d", i);
-        if (debug) NSLog(@"index : %d", index);
-        // if (debug) NSLog(@"point ==>> %@", NSStringFromPoint(point));
-        // if (debug) NSLog(@"numberofpoints =>> %d", numberofpoints);
+        if (index < 0) index = 0;
     }
-
-    if (debug) NSLog(@"------------------------------------");
 
     return path;
 }
@@ -175,6 +186,18 @@ clockwise:(Boolean)clockwise numberofpoints:(int)numberofpoints indexstart:
 
 - (NSWindow*)configureSheet {
     return nil;
+}
+
+
+
+/* utility */
+
+- (double) millis {
+
+    NSTimeInterval seconds = [NSDate timeIntervalSinceReferenceDate];
+    double milliseconds = seconds*1000;
+
+    return milliseconds;
 }
 
 @end

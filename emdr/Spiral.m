@@ -7,7 +7,7 @@
     instance = 0;                       
     sizer = 1.0;                         
     direction = 1;
-    cycles = 3.0;                   // rotations
+    cycles = 2.0;                   // rotations
     points = [[NSMutableArray alloc] initWithCapacity:0];
 }
 

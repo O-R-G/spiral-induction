@@ -7,17 +7,31 @@
 + spiral dynamic sizing
 + sizer hardcoding fix in emdrView.m
 + sizer parameter passing debug
-- timer
-  each time step through animateOneFrame check date 
-  if milliseconds >= timerstep 
-    draw and reset timerstep = 0
-- implement individual spiral directions in Spiral.m
-- retina vs non-retina display screensaver speed
-/ 3 cycles? 2 cycles?
-- counter - direction / index - indexdirection logic
-- smooth line thru bezier points
+x antialiasing
++ timerstep
+x bezier smoothing
+x sizing / spacing across screens exact
+x implement individual spiral directions in Spiral.m
++ retina vs non-retina display screensaver speed
++ 3 cycles? 2 cycles?
+x smooth line thru bezier points
   http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/
-- graphics speedup cggraphics bitmaps
+x graphics speedup cggraphics bitmaps
   http://alodar.com/docs/whitepapers/whitePaper-fastDrawMac.pdf
-- double spiral constructor
-- add non-linear movement to spiral dwg
+x double spiral constructor
+x add non-linear movement to spiral dwg
+x indexstarter
++ counter - direction / index - indexdirection logic
+
+- icons
+- preview
+- build, codesign, post
+  version w/ 2 spirals 
+  version w/ 3 spirals 
+  version w/ 2 spirals bigger at 1.5
+ 
+- description
+
+xcodebuild -scheme emdr build; cp -rf /Users/reinfurt/Library/Developer/Xcode/DerivedData/emdr-fngoisxcmikmcscjioumllgspeun/Build/Products/Debug/emdr.saver /Users/reinfurt/Library/Screen\ Savers/; open /System/Library/Frameworks/ScreenSaver.framework/Resources/ScreenSaverEngine.app
+
+
