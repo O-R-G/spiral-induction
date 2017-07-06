@@ -1,8 +1,8 @@
 #import <Foundation/Foundation.h>
 
 static int instance;
-static direction, cycles;
-static int direction, cycles;
+static int direction;
+static int cycles;
 static float sizer; 
 NSMutableArray *points;
 

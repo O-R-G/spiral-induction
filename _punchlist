@@ -7,7 +7,13 @@
 + spiral dynamic sizing
 + sizer hardcoding fix in emdrView.m
 + sizer parameter passing debug
-- implement individual spiral directions 
+- timer
+  each time step through animateOneFrame check date 
+  if milliseconds >= timerstep 
+    draw and reset timerstep = 0
+- implement individual spiral directions in Spiral.m
+- retina vs non-retina display screensaver speed
+/ 3 cycles? 2 cycles?
 - counter - direction / index - indexdirection logic
 - smooth line thru bezier points
   http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/

@@ -33,7 +33,7 @@
     pointsmax = 30;                     
     float sizer = [self bounds].size.width * .001;      
     spiral = [[Spiral alloc] initWithSize: sizer];
-    [spiral makeWithPoints: pointsmax clockwise: true];
+    [spiral makeWithPoints: pointsmax clockwise: false];
     // spiralcounterclockwise = [[Spiral alloc] init];
     // [spiralcounterclockwise makeWithPoints: pointsmax clockwise: true];
     direction = [spiral direction];  
@@ -81,7 +81,7 @@
     NSRectFill([self bounds]);                                  // clear screen
 
     NSBezierPath* spiralPath = [NSBezierPath bezierPath];
-    spiralPath = [self buildBezierPathFromPointsWithIndex: spiralPath clockwise: true numberofpoints: counter indexstart: 0 indexdirection: direction];
+    spiralPath = [self buildBezierPathFromPointsWithIndex: spiralPath clockwise: false numberofpoints: counter indexstart: 0 indexdirection: direction];
     [spiralPath setLineWidth:1.0];
     [green setStroke];
 
