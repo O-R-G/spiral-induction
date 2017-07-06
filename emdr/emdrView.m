@@ -8,7 +8,7 @@
 
 #import "emdrView.h"
 #import <Foundation/Foundation.h>
-#import "Spiral.m"
+#import "SpiralDouble.m"
 
 @implementation emdrView
 
@@ -35,7 +35,8 @@
     pointsmax = 30;
     float scaler = .001;
     float sizer = [self bounds].size.width * scaler;
-    spiral = [[Spiral alloc] initWithSize: sizer];
+    // spiral = [[Spiral alloc] initWithSize: sizer];
+    spiral = [[SpiralDouble alloc] initWithSize: sizer];
     [spiral makeWithPoints: pointsmax clockwise: false];
     direction = [spiral direction];  
     points = [spiral points];
@@ -43,7 +44,7 @@
     // grid
               
     rows = 6;
-    columns = 9;
+    columns = 6;
     extrudes = 15;
     offsetx = [self bounds].size.width / (columns + 1);     // between columns
     offsety = [self bounds].size.height / (rows + 1);       // between rows
@@ -140,7 +141,8 @@ direction];
         // wind up / down
 
         counter += direction;
-        if (counter >= pointsmax || counter <= 0) direction *= -1;
+        // if (counter >= pointsmax || counter <= 0) direction *= -1;   // spiral
+        if (counter >= pointsmax * 2 || counter <= 0) direction *= -1;  // spiraldouble
 
         millissinceupdate = 0;
     }
