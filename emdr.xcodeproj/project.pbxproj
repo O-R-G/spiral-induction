@@ -9,13 +9,17 @@
 /* Begin PBXBuildFile section */
 		933F17201E93CE4200BBDEAF /* emdrView.h in Headers */ = {isa = PBXBuildFile; fileRef = 933F171F1E93CE4200BBDEAF /* emdrView.h */; };
 		933F17221E93CE4200BBDEAF /* emdrView.m in Sources */ = {isa = PBXBuildFile; fileRef = 933F17211E93CE4200BBDEAF /* emdrView.m */; };
+		93EE7E7D1F0E4A8F00D4BACA /* thumbnail@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 93EE7E7C1F0E4A8F00D4BACA /* thumbnail@2x.png */; };
+		93EE7E7F1F0E4A9300D4BACA /* thumbnail.png in Resources */ = {isa = PBXBuildFile; fileRef = 93EE7E7E1F0E4A9300D4BACA /* thumbnail.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		933F171C1E93CE4200BBDEAF /* emdr.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = emdr.saver; sourceTree = BUILT_PRODUCTS_DIR; };
+		933F171C1E93CE4200BBDEAF /* spiralinduction.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = spiralinduction.saver; sourceTree = BUILT_PRODUCTS_DIR; };
 		933F171F1E93CE4200BBDEAF /* emdrView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = emdrView.h; sourceTree = "<group>"; };
 		933F17211E93CE4200BBDEAF /* emdrView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = emdrView.m; sourceTree = "<group>"; };
 		933F17231E93CE4200BBDEAF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		93EE7E7C1F0E4A8F00D4BACA /* thumbnail@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "thumbnail@2x.png"; sourceTree = "<group>"; };
+		93EE7E7E1F0E4A9300D4BACA /* thumbnail.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = thumbnail.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -40,7 +44,7 @@
 		933F171D1E93CE4200BBDEAF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				933F171C1E93CE4200BBDEAF /* emdr.saver */,
+				933F171C1E93CE4200BBDEAF /* spiralinduction.saver */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -50,6 +54,8 @@
 			children = (
 				933F171F1E93CE4200BBDEAF /* emdrView.h */,
 				933F17211E93CE4200BBDEAF /* emdrView.m */,
+				93EE7E7C1F0E4A8F00D4BACA /* thumbnail@2x.png */,
+				93EE7E7E1F0E4A9300D4BACA /* thumbnail.png */,
 				933F17231E93CE4200BBDEAF /* Info.plist */,
 			);
 			path = emdr;
@@ -69,9 +75,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		933F171B1E93CE4200BBDEAF /* emdr */ = {
+		933F171B1E93CE4200BBDEAF /* spiralinduction */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 933F17261E93CE4200BBDEAF /* Build configuration list for PBXNativeTarget "emdr" */;
+			buildConfigurationList = 933F17261E93CE4200BBDEAF /* Build configuration list for PBXNativeTarget "spiralinduction" */;
 			buildPhases = (
 				933F17171E93CE4200BBDEAF /* Sources */,
 				933F17181E93CE4200BBDEAF /* Frameworks */,
@@ -82,9 +88,9 @@
 			);
 			dependencies = (
 			);
-			name = emdr;
+			name = spiralinduction;
 			productName = emdr;
-			productReference = 933F171C1E93CE4200BBDEAF /* emdr.saver */;
+			productReference = 933F171C1E93CE4200BBDEAF /* spiralinduction.saver */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -115,7 +121,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				933F171B1E93CE4200BBDEAF /* emdr */,
+				933F171B1E93CE4200BBDEAF /* spiralinduction */,
 			);
 		};
 /* End PBXProject section */
@@ -125,6 +131,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93EE7E7F1F0E4A9300D4BACA /* thumbnail.png in Resources */,
+				93EE7E7D1F0E4A8F00D4BACA /* thumbnail@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,12 +242,14 @@
 		933F17271E93CE4200BBDEAF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 2T5W462SEL;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = emdr/Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.o-r-g.emdr";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = saver;
 			};
 			name = Debug;
@@ -247,12 +257,14 @@
 		933F17281E93CE4200BBDEAF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 2T5W462SEL;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = emdr/Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.o-r-g.emdr";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = saver;
 			};
 			name = Release;
@@ -269,13 +281,14 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		933F17261E93CE4200BBDEAF /* Build configuration list for PBXNativeTarget "emdr" */ = {
+		933F17261E93CE4200BBDEAF /* Build configuration list for PBXNativeTarget "spiralinduction" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				933F17271E93CE4200BBDEAF /* Debug */,
 				933F17281E93CE4200BBDEAF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

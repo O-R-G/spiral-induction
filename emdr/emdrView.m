@@ -7,28 +7,60 @@
 //
 
 #import "emdrView.h"
+#import <Foundation/Foundation.h>
+#import "Spiral.m"
 
 @implementation emdrView
 
-- (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview 
-{
+- (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview {
+
+    // self 
+
     self = [super initWithFrame:frame isPreview:isPreview];
     if (self) 
         [self setAnimationTimeInterval:1/30.0];
 
-    // set globals
+    // graphics context
+    // using cocoa drawing (NS) (a superset of quartz 2d (CG))
 
-    radius = ( [self bounds].size.width / 5 );
-    xCenter = ( [self bounds].size.width / 2 );
-    yCenter = ( [self bounds].size.height / 2 );
-    rows = 8;
-    columns = 10;
-    numberofpointsmax = 102; // [64] [128] [256]
+    context = [NSGraphicsContext currentContext];
+    // [NSBezierPath setDefaultFlatness: 10.0];
+    red = [NSColor colorWithRed: 1.0 green: 0.0 blue: 0.0 alpha: 1.0];
+    green = [NSColor colorWithRed: 0.25 green: 0.75 blue: 0.0 alpha: 1.0];
+    blue = [NSColor colorWithRed: 0.0 green: 0.0 blue: 1.0 alpha: 1.0];
+    [[NSColor blackColor] setFill];
+
+    // spiral
+
+    pointsmax = 30;
+    float scaler = .001;
+    float sizer = [self bounds].size.width * scaler;
+    spiral = [[Spiral alloc] initWithSize: sizer];
+    [spiral makeWithPoints: pointsmax clockwise: false];
+    points = [spiral points];
+
+    // grid
+              
+    rows = 6;               // [5]
+    columns = 9;            // [9]
+    extrudes = 15;          // [15]
+    offsetx = [self bounds].size.width / (columns + 1);     // between columns
+    offsety = [self bounds].size.height / (rows + 1);       // between rows
+    offsetz = [self bounds].size.height / (rows + 1) / 30;  // between extrudes
+
+    // utility
+
+    timerstep = 80.0;                       // millis (max speed) [40.0]
+    debug = false;
+    increment = 1;  
     counter = 0;
-    direction = 1;
-    spiralsize = ( [self bounds].size.height / (columns*150) );     // hardcoded ** fix **
-    // spiralsize = 0.55; // [0.25] [0.35] [1.0]
-    grid = true;
+
+    if (debug) [spiral debug];
+    if (debug) NSLog(@"offsetx [self bounds].size.width = %f", [self bounds].size.width);
+    if (debug) NSLog(@"offsetx = %d", offsetx);
+    if (debug) NSLog(@"offsety [self bounds].size.height = %f", [self bounds].size.height);
+    if (debug) NSLog(@"offsety = %d", offsety);
+
     return self;
 }
 
@@ -46,202 +78,127 @@
 
 - (void)animateOneFrame {
 
-    // using cocoa drawing (NS) (a superset of quartz 2d (CG))
+    // update?
 
-    NSGraphicsContext* context = [NSGraphicsContext currentContext];
+    lastmillis = thismillis;
+    thismillis = [self millis];
+    double elapsedmillis = thismillis - lastmillis;
+    if (elapsedmillis < timerstep) millissinceupdate += elapsedmillis;
+    else millissinceupdate = elapsedmillis;
 
-    [self checkTime_nsdate]; // system time milliseconds (CGFloat) sweep
+    // draw 
 
-    NSColor* yellow = [NSColor colorWithRed: 1.0 green: 1.0 blue: 0.0 alpha: 1.0];
-    NSColor* green = [NSColor colorWithRed: 0.0 green: 1.0 blue: 0.0 alpha: 1.0];
-    NSColor* red = [NSColor colorWithRed: 1.0 green: 0.0 blue: 0.0 alpha: 1.0];
-    NSColor* blue = [NSColor colorWithRed: 0.0 green: 0.0 blue: 1.0 alpha: 1.0];
-        
-    [[NSColor blackColor] set];
-    NSRectFill([self bounds]);
-    
-    // spirals
-    // better to just make a spiral object? with properties?
-    // could also "animate" the spiral in the build method, like an update using a counter
-    // best fit bezier from points?
-    // http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/
+    if (millissinceupdate > timerstep) {
 
-    NSBezierPath* spiralLeft = [NSBezierPath bezierPath];
-    NSBezierPath* spiralRight = [NSBezierPath bezierPath];
-    spiralLeft = [self buildBezierSpiralWithPath: spiralLeft clockwise: true drawBezierPoints: false numberofpoints: counter];
-    spiralRight = [self buildBezierSpiralWithPath: spiralRight clockwise: false drawBezierPoints: false numberofpoints: numberofpointsmax - counter];
+        NSRectFill([self bounds]);                  // clear screen
 
-    // draw
- 
-    // [xform set] adds all the new transform to the matrix
-    // [xform concat] adds the new transform plus all existing transforms again to the matrix
-    // [xform invert] undoes the previous transform by applying an inverse transform to matrix
-    // [context saveGraphicsState] push current matrix onto the stack
-    // [context restoreGraphicsState] pop current matrix off the stack
+        NSBezierPath* spiralPath = [NSBezierPath bezierPath];
 
-    NSAffineTransform* xform = [NSAffineTransform transform]; // identity transform (ground state)
+        spiralPath = [self buildBezierPathFromPointsWithIndex: 
+spiralPath numberofpoints: counter indexstart: 0 indexdirection: 
+increment];
+        [green setStroke];
 
-    [spiralRight setLineWidth:1.0];
-    [spiralLeft setLineWidth:1.0];
-    [green setStroke];
+        NSAffineTransform* xform = [NSAffineTransform transform];   // identity
+        // [xform translateXBy: 0.0 yBy: -offsety / 3];                // adjust
+        [xform translateXBy: offsetx / 5 yBy: -offsety / 5];                // adjust
 
-    // 1. offset x, y to draw grid of spirals from centers based on screen width, height
-        
-    [xform translateXBy:-[self bounds].size.width/columns/2 yBy:-[self bounds].size.height/rows/2];
-    [xform set];
+        for (int y = 0; y < rows; y++) {
 
-    // columns
+            // row
 
-    for (int j = 0; j < columns; j++) {
-  
-        // rows (spiralRight)
+            [xform translateXBy: 0.0 yBy: offsety];
+            [xform set];
+
+            for (int x = 0; x < columns; x++) {         
+
+                // column
+
+                [xform translateXBy: offsetx yBy: 0.0];
+                [xform set];
+
+                for (int i = 0; i < extrudes; i++) {
+
+                    // extrude
+
+                    if (x % 2 == 0) {
+
+                        [xform translateXBy: -offsetz yBy: offsetz];
+                        [xform set];
+                        [spiralPath stroke];
+
+                    } else {
+
+                        [xform translateXBy: -offsetz yBy: offsetz];
+                        [xform rotateByDegrees:180];
+                        [xform set];
+                        [spiralPath stroke];
+                        [xform rotateByDegrees:-180];
+                    }
+                }
             
-        [xform translateXBy:[self bounds].size.width/columns yBy: 0.0];                 // shift x
-        [xform set];
+                // reset extrude
 
-        for (int i = 0; i < rows; i++) {
-            [xform translateXBy:0.0 yBy:[self bounds].size.height/rows];                // shift y
+                [xform translateXBy: offsetz * extrudes yBy: -offsetz * extrudes];
+                [xform set];
+            }            
+            
+            // reset column
+
+            [xform translateXBy: -offsetx * columns yBy: 0.0];
             [xform set];
-            [spiralRight stroke];
         }
 
-        // if edgesonly then increment j a lot and translate x a lot
+        // wind up / down
 
-        [xform translateXBy:0.0 yBy: -[self bounds].size.height]; // reset y
-        [xform set];
-
-        // rows (spiralLeft)
-
-        [xform translateXBy:[self bounds].size.width/columns yBy: 0.0];                 // shift x
-        if (!grid) 
-            [xform translateXBy:[self bounds].size.width/columns*8 yBy: 0.0];           // shift x to edge
-                                                                                        // hardcoded, ** fix **
-        [xform set];
- 
-        for (int i = 0; i < rows; i++) {
-            [xform translateXBy:0.0 yBy:[self bounds].size.height/rows];                // shift y
-            [xform set];
-            [spiralLeft stroke];
+        counter += increment;
+        if (counter >= pointsmax || counter <= 0) increment *= -1;
+        /*
+        // pause drawing at end of spiral
+        if (counter >= pointsmax || counter <= 0) {
+            increment *= -1;
+            timerstep = 100.0;
+        } else {
+            timerstep = 50.0;
         }
+        */
+        millissinceupdate = 0;
+    }
+}
 
-        [xform translateXBy:0.0 yBy: -[self bounds].size.height];                       // reset y
-        [xform set];
 
-        if (!grid) 
-            j = columns;                                                                // exit loop
+
+/* bezier paths */
+
+- (NSBezierPath*)buildBezierPathFromPointsWithIndex:(NSBezierPath*)path 
+numberofpoints:(int)numberofpoints indexstart: (int)indexstart 
+indexdirection:(int)indexdirection {
+    
+    int index = indexstart;
+    if (!indexstart) indexstart = 0;
+    if (!indexdirection) indexdirection = 1;            // 1 | -1
+    indexdirection = 1;                              // force roll unroll
+
+    if (numberofpoints > pointsmax) numberofpoints = pointsmax; 
+    numberofpoints = numberofpoints - indexstart;
+
+    id object = [points objectAtIndex:indexstart];
+    NSPoint point = [object pointValue];
+    [path moveToPoint:point];                           // 0,0
+
+    for (int i = 0; i < numberofpoints; i++) {
+
+        id object = [points objectAtIndex:index];
+        NSPoint point = [object pointValue];
+        [path lineToPoint:point];
+    
+        index+=indexdirection;
+
+        if (index > [points count] - 1) index = [points count] -1;
+        if (index < 0) index = 0;
     }
 
-    // wind up, wind down
-
-    counter += direction;
-    if (counter >= numberofpointsmax || counter <= 0) direction *= -1;
-
-    [context flushGraphics]; // necessary?
-}
-
-// spirals
-
-- (NSBezierPath*)buildBezierSpiralWithPath:(NSBezierPath*)thisPath clockwise:(Boolean)clockwise 
-drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
-    int spiraldirection = 1;
-    if (!clockwise) spiraldirection = -1;
-
-    [thisPath moveToPoint:NSMakePoint(0.0, 0.0)];
-
-    for (float i = 0; i <= numberofpoints; i+=1.0) {
-
-        float x = i * spiralsize * cos(secondtodegree(i) * spiraldirection);
-        float y = i * spiralsize * sin(secondtodegree(i) * spiraldirection);
-        [thisPath lineToPoint:NSMakePoint(x, y)];
-
-        if (drawBezierPoints) {
-            NSRect thisRect = (NSRect){ .origin.x = x, .origin.y = y, .size.width = 3.0, .size.height = 3.0 };
-            NSBezierPath* aCircle = [NSBezierPath bezierPathWithOvalInRect:thisRect];
-            [[NSColor blueColor] setFill];
-            [aCircle setLineWidth:0.25];
-            [aCircle fill];
-        }
-    }
-
-    return thisPath;
-}
-
-- (NSBezierPath*)buildBezierDoubleSpiralWithPath:(NSBezierPath*)thisPath clockwise:(Boolean)clockwise 
-drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
-
-    // ** todo **
-    // this builds a double spiral, when it arrives at max number of points then 
-    // proceed to the next spiral, unwrapping it
-
-    int spiraldirection = 1;
-    if (!clockwise) spiraldirection = -1;
-
-    [thisPath moveToPoint:NSMakePoint(0.0, 0.0)];
-
-    for (float i = 0; i <= numberofpoints; i+=1.0) {
-
-        float x = i * spiralsize * cos(secondtodegree(i) * spiraldirection);
-        float y = i * spiralsize * sin(secondtodegree(i) * spiraldirection);
-        [thisPath lineToPoint:NSMakePoint(x, y)];
-
-        if (drawBezierPoints) {
-            NSRect thisRect = (NSRect){ .origin.x = x, .origin.y = y, .size.width = 3.0, .size.height = 3.0 };
-            NSBezierPath* aCircle = [NSBezierPath bezierPathWithOvalInRect:thisRect];
-            [[NSColor blueColor] setFill];
-            [aCircle setLineWidth:0.25];
-            [aCircle fill];
-        }
-    }
-
-    return thisPath;
-}
-
-- (void) checkTime_nsdate {
-    // get current time in milliseconds
-    
-    NSDate *now = [NSDate date];
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    formatter.dateFormat = @"hh:mm:ss.SSS";
-    NSString *string = [formatter stringFromDate: now];
-    NSArray *timeComponents = [string componentsSeparatedByString:@":"];
-    
-    NSInteger hr = [timeComponents[0] integerValue];
-    NSInteger min = [timeComponents[1] integerValue];
-    sweepsecond = [timeComponents[2] floatValue];
-    sweepminute = min + (sweepsecond / 60.0);
-    sweephour = hr + (sweepminute / 60.0);
-    
-    return;
-}
-
-- (void)debugText:(CGFloat)xPosition yPosition:(CGFloat)yPosition canvasWidth:(CGFloat)canvasWidth canvasHeight:(CGFloat)canvasHeight {
-
-    //Draw Text
-    CGRect textRect0 = CGRectMake(xPosition, yPosition, canvasWidth, canvasHeight);
-    CGRect textRect1 = CGRectMake(xPosition, yPosition-12, canvasWidth, canvasHeight);
-    CGRect textRect2 = CGRectMake(xPosition, yPosition-24, canvasWidth, canvasHeight);
-    NSMutableParagraphStyle* textStyle = NSMutableParagraphStyle.defaultParagraphStyle.mutableCopy;
-    textStyle.alignment = NSTextAlignmentLeft;
-    NSDictionary* textFontAttributes = @{NSFontAttributeName: [NSFont fontWithName: @"Courier New" size: 12], 
-    NSForegroundColorAttributeName: NSColor.redColor, NSParagraphStyleAttributeName: textStyle};
-    
-    NSString *debug0 = [NSString stringWithFormat: @"0 : %f", sweephour];
-    NSString *debug1 = [NSString stringWithFormat: @"1 : %f", sweepminute];
-    NSString *debug2 = [NSString stringWithFormat: @"2 : %f", sweepsecond];
-    
-    /*
-     // output to log
-     
-     NSLog(@"====================================================================");
-     NSLog(@"h: %f", sweephour);
-     NSLog(@"m: %f", sweepminute);
-     NSLog(@"s %f", sweepsecond);
-     NSLog(@"====================================================================");
-     */
-    
-    [debug0 drawInRect: textRect0 withAttributes: textFontAttributes];
-    [debug1 drawInRect: textRect1 withAttributes: textFontAttributes];
-    [debug2 drawInRect: textRect2 withAttributes: textFontAttributes];
+    return path;
 }
 
 - (BOOL)hasConfigureSheet {
@@ -250,6 +207,18 @@ drawBezierPoints:(Boolean)drawBezierPoints numberofpoints:(int)numberofpoints {
 
 - (NSWindow*)configureSheet {
     return nil;
+}
+
+
+
+/* utility */
+
+- (double) millis {
+
+    NSTimeInterval seconds = [NSDate timeIntervalSinceReferenceDate];
+    double milliseconds = seconds*1000;
+
+    return milliseconds;
 }
 
 @end

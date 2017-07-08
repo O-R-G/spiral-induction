@@ -1,0 +1,36 @@
++ extrusions
++ grid
++ grid fix hardcoding
++ buildBezierPathFromPointsWithIndex add
++ bezier path direction parameter
++ draw / erase spiral
++ spiral dynamic sizing
++ sizer hardcoding fix in emdrView.m
++ sizer parameter passing debug
+x antialiasing
++ timerstep
+x bezier smoothing
+x sizing / spacing across screens exact
+x implement individual spiral directions in Spiral.m
++ retina vs non-retina display screensaver speed
++ 3 cycles? 2 cycles?
+x smooth line thru bezier points
+  http://ymedialabs.github.io/blog/2015/05/12/draw-a-bezier-curve-through-a-set-of-2d-points-in-ios/
+x graphics speedup cggraphics bitmaps
+  http://alodar.com/docs/whitepapers/whitePaper-fastDrawMac.pdf
+x double spiral constructor
+x add non-linear movement to spiral dwg
+x indexstarter
++ counter - direction / index - indexdirection logic
++ icons
++ preview
++ build, codesign, post (see _notes.txt)
+  version w/ 2 spirals 
+  version w/ 3 spirals 
+  version w/ 2 spirals bigger at 1.5 
++ description
+x in the future, work out how interfaces and objects work
++ shift all to the right 1/2 width of all spirals together
+- merge branches
+- add github repo
+- post final
