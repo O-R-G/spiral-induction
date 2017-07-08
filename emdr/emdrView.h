@@ -7,14 +7,14 @@
 //
 
 #import <ScreenSaver/ScreenSaver.h>
-#import "SpiralDouble.h"
+#import "Spiral.h"
 
 @interface emdrView : ScreenSaverView {
 
     // globals
     
     int pointsmax;
-    int counter, direction;
+    int counter, increment;
     int rows, columns, extrudes, offsetx, offsety, offsetz;
     double millis, thismillis, lastmillis, millissinceupdate;
     double timerstep;
@@ -22,7 +22,7 @@
  
     // objects
 
-    SpiralDouble* spiral; 
+    Spiral* spiral; 
     NSMutableArray* points;
     NSGraphicsContext *context;
     NSColor *red, *green, *blue;        

@@ -8,7 +8,7 @@
 
 #import "emdrView.h"
 #import <Foundation/Foundation.h>
-#import "SpiralDouble.m"
+#import "Spiral.m"
 
 @implementation emdrView
 
@@ -35,25 +35,24 @@
     pointsmax = 30;
     float scaler = .001;
     float sizer = [self bounds].size.width * scaler;
-    // spiral = [[Spiral alloc] initWithSize: sizer];
-    spiral = [[SpiralDouble alloc] initWithSize: sizer];
+    spiral = [[Spiral alloc] initWithSize: sizer];
     [spiral makeWithPoints: pointsmax clockwise: false];
-    direction = [spiral direction];  
     points = [spiral points];
 
     // grid
               
-    rows = 6;
-    columns = 6;
-    extrudes = 15;
+    rows = 6;               // [5]
+    columns = 9;            // [9]
+    extrudes = 15;          // [15]
     offsetx = [self bounds].size.width / (columns + 1);     // between columns
     offsety = [self bounds].size.height / (rows + 1);       // between rows
     offsetz = [self bounds].size.height / (rows + 1) / 30;  // between extrudes
 
     // utility
 
-    timerstep = 50.0;                                       // millis (max speed)
+    timerstep = 50.0;                       // millis (max speed) [40.0]
     debug = false;
+    increment = 1;  
     counter = 0;
 
     if (debug) [spiral debug];
@@ -94,10 +93,10 @@
         NSRectFill([self bounds]);                  // clear screen
 
         NSBezierPath* spiralPath = [NSBezierPath bezierPath];
-        spiralPath = [self buildBezierPathFromPointsWithIndex: spiralPath 
-clockwise: false numberofpoints: counter indexstart: 0 indexdirection: 
-direction];
-        [spiralPath setLineWidth:1.0];
+
+        spiralPath = [self buildBezierPathFromPointsWithIndex: 
+spiralPath numberofpoints: counter indexstart: 0 indexdirection: 
+increment];
         [green setStroke];
 
         NSAffineTransform* xform = [NSAffineTransform transform];   // identity
@@ -121,9 +120,20 @@ direction];
 
                     // extrude
 
-                    [xform translateXBy: -offsetz yBy: offsetz];
-                    [xform set];
-                    [spiralPath stroke];
+                    if (x % 2 == 0) {
+
+                        [xform translateXBy: -offsetz yBy: offsetz];
+                        [xform set];
+                        [spiralPath stroke];
+
+                    } else {
+
+                        [xform translateXBy: -offsetz yBy: offsetz];
+                        [xform rotateByDegrees:180];
+                        [xform set];
+                        [spiralPath stroke];
+                        [xform rotateByDegrees:-180];
+                    }
                 }
             
                 // reset extrude
@@ -140,10 +150,17 @@ direction];
 
         // wind up / down
 
-        counter += direction;
-        // if (counter >= pointsmax || counter <= 0) direction *= -1;   // spiral
-        if (counter >= pointsmax * 2 || counter <= 0) direction *= -1;  // spiraldouble
-
+        counter += increment;
+        if (counter >= pointsmax || counter <= 0) increment *= -1;
+        /*
+        // pause at top
+        if (counter >= pointsmax || counter <= 0) {
+            increment *= -1;
+            timerstep = 100.0;
+        } else {
+            timerstep = 50.0;
+        }
+        */
         millissinceupdate = 0;
     }
 }
@@ -153,14 +170,15 @@ direction];
 /* bezier paths */
 
 - (NSBezierPath*)buildBezierPathFromPointsWithIndex:(NSBezierPath*)path 
-clockwise:(Boolean)clockwise numberofpoints:(int)numberofpoints indexstart: 
-(int)indexstart indexdirection:(int)indexdirection {
+numberofpoints:(int)numberofpoints indexstart: (int)indexstart 
+indexdirection:(int)indexdirection {
     
     int index = indexstart;
     if (!indexstart) indexstart = 0;
     if (!indexdirection) indexdirection = 1;            // 1 | -1
     indexdirection = 1;                              // force roll unroll
- 
+
+    if (numberofpoints > pointsmax) numberofpoints = pointsmax; 
     numberofpoints = numberofpoints - indexstart;
 
     id object = [points objectAtIndex:indexstart];

@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "933F171B1E93CE4200BBDEAF"
-               BuildableName = "emdr.saver"
-               BlueprintName = "emdr"
+               BuildableName = "spiralinduction.saver"
+               BlueprintName = "spiralinduction"
                ReferencedContainer = "container:emdr.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,8 +46,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "933F171B1E93CE4200BBDEAF"
-            BuildableName = "emdr.saver"
-            BlueprintName = "emdr"
+            BuildableName = "spiralinduction.saver"
+            BlueprintName = "spiralinduction"
             ReferencedContainer = "container:emdr.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -64,8 +64,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "933F171B1E93CE4200BBDEAF"
-            BuildableName = "emdr.saver"
-            BlueprintName = "emdr"
+            BuildableName = "spiralinduction.saver"
+            BlueprintName = "spiralinduction"
             ReferencedContainer = "container:emdr.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

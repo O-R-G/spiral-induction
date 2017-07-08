@@ -1,4 +1,4 @@
-// #import "Spiral.h"
+#import "Spiral.h"
 
 @implementation Spiral
 
@@ -6,8 +6,7 @@
 
     instance = 0;                       
     sizer = 1.0;                         
-    direction = 1;
-    cycles = 2.0;                   // rotations
+    cycles = 2.5;                   // rotations
     points = [[NSMutableArray alloc] initWithCapacity:0];
 }
 
@@ -54,13 +53,6 @@
     return sizer;
 }
 
-- (int) direction {
-
-    // default clockwise (in init)
-
-    return direction;
-}
-
 - (int) cycles {
 
     return cycles;
@@ -69,8 +61,7 @@
 - (void) debug {
 
     NSLog(@"instance : %d", instance);
-    NSLog(@"sizer : %d", sizer);
-    NSLog(@"direction : %d", direction);
+    NSLog(@"sizer : %f", sizer);
     NSLog(@"cycles : %d", cycles);
     NSLog(@"points : %@", points);
     NSLog(@"points count : %d", [points count]);

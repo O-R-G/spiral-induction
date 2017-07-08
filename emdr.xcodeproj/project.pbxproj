@@ -14,7 +14,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		933F171C1E93CE4200BBDEAF /* emdr.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = emdr.saver; sourceTree = BUILT_PRODUCTS_DIR; };
+		933F171C1E93CE4200BBDEAF /* spiralinduction.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = spiralinduction.saver; sourceTree = BUILT_PRODUCTS_DIR; };
 		933F171F1E93CE4200BBDEAF /* emdrView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = emdrView.h; sourceTree = "<group>"; };
 		933F17211E93CE4200BBDEAF /* emdrView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = emdrView.m; sourceTree = "<group>"; };
 		933F17231E93CE4200BBDEAF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -44,7 +44,7 @@
 		933F171D1E93CE4200BBDEAF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				933F171C1E93CE4200BBDEAF /* emdr.saver */,
+				933F171C1E93CE4200BBDEAF /* spiralinduction.saver */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -75,9 +75,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		933F171B1E93CE4200BBDEAF /* emdr */ = {
+		933F171B1E93CE4200BBDEAF /* spiralinduction */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 933F17261E93CE4200BBDEAF /* Build configuration list for PBXNativeTarget "emdr" */;
+			buildConfigurationList = 933F17261E93CE4200BBDEAF /* Build configuration list for PBXNativeTarget "spiralinduction" */;
 			buildPhases = (
 				933F17171E93CE4200BBDEAF /* Sources */,
 				933F17181E93CE4200BBDEAF /* Frameworks */,
@@ -88,9 +88,9 @@
 			);
 			dependencies = (
 			);
-			name = emdr;
+			name = spiralinduction;
 			productName = emdr;
-			productReference = 933F171C1E93CE4200BBDEAF /* emdr.saver */;
+			productReference = 933F171C1E93CE4200BBDEAF /* spiralinduction.saver */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -121,7 +121,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				933F171B1E93CE4200BBDEAF /* emdr */,
+				933F171B1E93CE4200BBDEAF /* spiralinduction */,
 			);
 		};
 /* End PBXProject section */
@@ -281,7 +281,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		933F17261E93CE4200BBDEAF /* Build configuration list for PBXNativeTarget "emdr" */ = {
+		933F17261E93CE4200BBDEAF /* Build configuration list for PBXNativeTarget "spiralinduction" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				933F17271E93CE4200BBDEAF /* Debug */,

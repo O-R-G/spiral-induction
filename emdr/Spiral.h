@@ -1,4 +1,4 @@
-#import <Foundation/Foundation.h>
+// #import <Foundation/Foundation.h>
 
 static int instance;
 static int direction;
@@ -15,12 +15,11 @@ static inline CGFloat mapValueWithRange (CGFloat value, CGFloat inMin, CGFloat i
     return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
 }
 
-@interface Spiral : NSObject {
-}
+@interface Spiral : NSObject
 
 + (void) initialize;
-- (id) initWithSize;
-- (NSMutableArray*) makeWithPoints;          
+- (id) initWithSize: (float)thissizer;
+- (id) makeWithPoints: (int)number clockwise:(Boolean)clockwise;
 - (NSMutableArray*) points;          
 - (float) sizer;
 - (int) direction;
