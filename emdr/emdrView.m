@@ -153,7 +153,7 @@ increment];
         counter += increment;
         if (counter >= pointsmax || counter <= 0) increment *= -1;
         /*
-        // pause at top
+        // pause drawing at end of spiral
         if (counter >= pointsmax || counter <= 0) {
             increment *= -1;
             timerstep = 100.0;
