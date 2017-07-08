@@ -50,7 +50,7 @@
 
     // utility
 
-    timerstep = 50.0;                       // millis (max speed) [40.0]
+    timerstep = 80.0;                       // millis (max speed) [40.0]
     debug = false;
     increment = 1;  
     counter = 0;
@@ -100,7 +100,8 @@ increment];
         [green setStroke];
 
         NSAffineTransform* xform = [NSAffineTransform transform];   // identity
-        [xform translateXBy: 0.0 yBy: -offsety / 3];                // adjust
+        // [xform translateXBy: 0.0 yBy: -offsety / 3];                // adjust
+        [xform translateXBy: offsetx / 5 yBy: -offsety / 5];                // adjust
 
         for (int y = 0; y < rows; y++) {
 
