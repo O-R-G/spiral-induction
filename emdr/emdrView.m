@@ -32,7 +32,7 @@
 
     // spiral
 
-    pointsmax = 30;
+    pointsmax = 60;
     float scaler = .001;
     float sizer = [self bounds].size.width * scaler;
     spiral = [[Spiral alloc] initWithSize: sizer];
@@ -44,9 +44,9 @@
     rows = 6;               // [5]
     columns = 9;            // [9]
     extrudes = 15;          // [15]
-    offsetx = [self bounds].size.width / (columns + 1);     // between columns
-    offsety = [self bounds].size.height / (rows + 1);       // between rows
-    offsetz = [self bounds].size.height / (rows + 1) / 30;  // between extrudes
+    offsetx = [self bounds].size.width*2 / (columns + 1);     // between columns
+    offsety = [self bounds].size.height*2 / (rows + 1);       // between rows
+    offsetz = [self bounds].size.height*2 / (rows + 1) / 30;  // between extrudes
 
     // utility
 
@@ -73,97 +73,98 @@
 }
 
 - (void)drawRect:(NSRect)rect {
+    // clears the screen
     [super drawRect:rect];
+    
+    // draw
+    NSBezierPath* spiralPath = [NSBezierPath bezierPath];
+    
+    spiralPath = [self buildBezierPathFromPointsWithIndex:
+                  spiralPath numberofpoints: counter indexstart: 0 indexdirection:
+                  increment];
+    [green setStroke];
+    
+    NSAffineTransform* xform = [NSAffineTransform transform];   // identity
+    // [xform translateXBy: 0.0 yBy: -offsety / 3];                // adjust
+    [xform translateXBy: offsetx / 5 yBy: -offsety / 5];                // adjust
+    
+    for (int y = 0; y < rows; y++) {
+        
+        // row
+        
+        [xform translateXBy: 0.0 yBy: offsety];
+        [xform set];
+        
+        for (int x = 0; x < columns; x++) {
+            
+            // column
+            
+            [xform translateXBy: offsetx yBy: 0.0];
+            [xform set];
+            
+            for (int i = 0; i < extrudes; i++) {
+                
+                // extrude
+                
+                if (x % 2 == 0) {
+                    
+                    [xform translateXBy: -offsetz yBy: offsetz];
+                    [xform set];
+                    [spiralPath stroke];
+                    
+                } else {
+                    
+                    [xform translateXBy: -offsetz yBy: offsetz];
+                    [xform rotateByDegrees:180];
+                    [xform set];
+                    [spiralPath stroke];
+                    [xform rotateByDegrees:-180];
+                }
+            }
+            
+            // reset extrude
+            
+            [xform translateXBy: offsetz * extrudes yBy: -offsetz * extrudes];
+            [xform set];
+        }
+        
+        // reset column
+        
+        [xform translateXBy: -offsetx * columns yBy: 0.0];
+        [xform set];
+    }
 }
 
 - (void)animateOneFrame {
 
     // update?
-
     lastmillis = thismillis;
     thismillis = [self millis];
     double elapsedmillis = thismillis - lastmillis;
+    
     if (elapsedmillis < timerstep) millissinceupdate += elapsedmillis;
     else millissinceupdate = elapsedmillis;
-
-    // draw 
-
+    
     if (millissinceupdate > timerstep) {
-
-        NSRectFill([self bounds]);                  // clear screen
-
-        NSBezierPath* spiralPath = [NSBezierPath bezierPath];
-
-        spiralPath = [self buildBezierPathFromPointsWithIndex: 
-spiralPath numberofpoints: counter indexstart: 0 indexdirection: 
-increment];
-        [green setStroke];
-
-        NSAffineTransform* xform = [NSAffineTransform transform];   // identity
-        // [xform translateXBy: 0.0 yBy: -offsety / 3];                // adjust
-        [xform translateXBy: offsetx / 5 yBy: -offsety / 5];                // adjust
-
-        for (int y = 0; y < rows; y++) {
-
-            // row
-
-            [xform translateXBy: 0.0 yBy: offsety];
-            [xform set];
-
-            for (int x = 0; x < columns; x++) {         
-
-                // column
-
-                [xform translateXBy: offsetx yBy: 0.0];
-                [xform set];
-
-                for (int i = 0; i < extrudes; i++) {
-
-                    // extrude
-
-                    if (x % 2 == 0) {
-
-                        [xform translateXBy: -offsetz yBy: offsetz];
-                        [xform set];
-                        [spiralPath stroke];
-
-                    } else {
-
-                        [xform translateXBy: -offsetz yBy: offsetz];
-                        [xform rotateByDegrees:180];
-                        [xform set];
-                        [spiralPath stroke];
-                        [xform rotateByDegrees:-180];
-                    }
-                }
-            
-                // reset extrude
-
-                [xform translateXBy: offsetz * extrudes yBy: -offsetz * extrudes];
-                [xform set];
-            }            
-            
-            // reset column
-
-            [xform translateXBy: -offsetx * columns yBy: 0.0];
-            [xform set];
-        }
-
+        [self setNeedsDisplay:YES];
+        
         // wind up / down
-
+        
         counter += increment;
         if (counter >= pointsmax || counter <= 0) increment *= -1;
         /*
-        // pause drawing at end of spiral
-        if (counter >= pointsmax || counter <= 0) {
-            increment *= -1;
-            timerstep = 100.0;
-        } else {
-            timerstep = 50.0;
-        }
-        */
+         // pause drawing at end of spiral
+         if (counter >= pointsmax || counter <= 0) {
+         increment *= -1;
+         timerstep = 100.0;
+         } else {
+         timerstep = 50.0;
+         }
+         */
         millissinceupdate = 0;
     }
+    
+    return;
 }
 
 
