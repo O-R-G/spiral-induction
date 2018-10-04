@@ -14,7 +14,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		933F171C1E93CE4200BBDEAF /* spiralinduction.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = spiralinduction.saver; sourceTree = BUILT_PRODUCTS_DIR; };
+		933F171C1E93CE4200BBDEAF /* Spiral Induction.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Spiral Induction.saver"; sourceTree = BUILT_PRODUCTS_DIR; };
 		933F171F1E93CE4200BBDEAF /* emdrView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = emdrView.h; sourceTree = "<group>"; };
 		933F17211E93CE4200BBDEAF /* emdrView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = emdrView.m; sourceTree = "<group>"; };
 		933F17231E93CE4200BBDEAF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -44,7 +44,7 @@
 		933F171D1E93CE4200BBDEAF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				933F171C1E93CE4200BBDEAF /* spiralinduction.saver */,
+				933F171C1E93CE4200BBDEAF /* Spiral Induction.saver */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -75,9 +75,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		933F171B1E93CE4200BBDEAF /* spiralinduction */ = {
+		933F171B1E93CE4200BBDEAF /* Spiral Induction */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 933F17261E93CE4200BBDEAF /* Build configuration list for PBXNativeTarget "spiralinduction" */;
+			buildConfigurationList = 933F17261E93CE4200BBDEAF /* Build configuration list for PBXNativeTarget "Spiral Induction" */;
 			buildPhases = (
 				933F17171E93CE4200BBDEAF /* Sources */,
 				933F17181E93CE4200BBDEAF /* Frameworks */,
@@ -88,9 +88,9 @@
 			);
 			dependencies = (
 			);
-			name = spiralinduction;
+			name = "Spiral Induction";
 			productName = emdr;
-			productReference = 933F171C1E93CE4200BBDEAF /* spiralinduction.saver */;
+			productReference = 933F171C1E93CE4200BBDEAF /* Spiral Induction.saver */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -105,7 +105,7 @@
 					933F171B1E93CE4200BBDEAF = {
 						CreatedOnToolsVersion = 8.3;
 						DevelopmentTeam = 2T5W462SEL;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -121,7 +121,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				933F171B1E93CE4200BBDEAF /* spiralinduction */,
+				933F171B1E93CE4200BBDEAF /* Spiral Induction */,
 			);
 		};
 /* End PBXProject section */
@@ -191,7 +191,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -233,7 +233,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
@@ -242,9 +242,10 @@
 		933F17271E93CE4200BBDEAF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 2T5W462SEL;
 				INFOPLIST_FILE = emdr/Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.o-r-g.emdr";
@@ -257,9 +258,10 @@
 		933F17281E93CE4200BBDEAF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 2T5W462SEL;
 				INFOPLIST_FILE = emdr/Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.o-r-g.emdr";
@@ -281,7 +283,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		933F17261E93CE4200BBDEAF /* Build configuration list for PBXNativeTarget "spiralinduction" */ = {
+		933F17261E93CE4200BBDEAF /* Build configuration list for PBXNativeTarget "Spiral Induction" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				933F17271E93CE4200BBDEAF /* Debug */,

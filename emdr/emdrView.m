@@ -31,10 +31,16 @@
     [[NSColor blackColor] setFill];
 
     // spiral
+    NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
 
-    pointsmax = 60;
+    float backingScaleFactor = 1;
+    if (version.minorVersion >= 14) {
+        backingScaleFactor = 2;
+    }
+    
+    pointsmax = 30;
     float scaler = .001;
-    float sizer = [self bounds].size.width * scaler;
+    float sizer = [self bounds].size.width * scaler * backingScaleFactor;
     spiral = [[Spiral alloc] initWithSize: sizer];
     [spiral makeWithPoints: pointsmax clockwise: false];
     points = [spiral points];
@@ -44,9 +50,9 @@
     rows = 6;               // [5]
     columns = 9;            // [9]
     extrudes = 15;          // [15]
-    offsetx = [self bounds].size.width*2 / (columns + 1);     // between columns
-    offsety = [self bounds].size.height*2 / (rows + 1);       // between rows
-    offsetz = [self bounds].size.height*2 / (rows + 1) / 30;  // between extrudes
+    offsetx = [self bounds].size.width * backingScaleFactor / (columns + 1);     // between columns
+    offsety = [self bounds].size.height * backingScaleFactor / (rows + 1);       // between rows
+    offsetz = [self bounds].size.height * backingScaleFactor / (rows + 1) / 30;  // between extrudes
 
     // utility
 
