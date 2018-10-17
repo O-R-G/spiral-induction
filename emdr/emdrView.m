@@ -31,16 +31,19 @@
     [[NSColor blackColor] setFill];
 
     // spiral
-    NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
+//    NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
 
-    float backingScaleFactor = 1;
-    if (version.minorVersion >= 14) {
-        backingScaleFactor = 2;
-    }
+    float backingScaleFactor = 1.0; //[[NSScreen mainScreen] backingScaleFactor];
+//    if (version.minorVersion >= 14) {
+//        backingScaleFactor = 2;
+//    }
     
     pointsmax = 30;
     float scaler = .001;
-    float sizer = [self bounds].size.width * scaler * backingScaleFactor;
+    
+    CGSize size = [self frame].size;
+    
+    float sizer = size.width * scaler * backingScaleFactor;
     spiral = [[Spiral alloc] initWithSize: sizer];
     [spiral makeWithPoints: pointsmax clockwise: false];
     points = [spiral points];
@@ -50,9 +53,9 @@
     rows = 6;               // [5]
     columns = 9;            // [9]
     extrudes = 15;          // [15]
-    offsetx = [self bounds].size.width * backingScaleFactor / (columns + 1);     // between columns
-    offsety = [self bounds].size.height * backingScaleFactor / (rows + 1);       // between rows
-    offsetz = [self bounds].size.height * backingScaleFactor / (rows + 1) / 30;  // between extrudes
+    offsetx = size.width * backingScaleFactor / (columns + 1);     // between columns
+    offsety = size.height * backingScaleFactor / (rows + 1);       // between rows
+    offsetz = size.height * backingScaleFactor / (rows + 1) / 30;  // between extrudes
 
     // utility
 
@@ -90,54 +93,31 @@
                   increment];
     [green setStroke];
     
-    NSAffineTransform* xform = [NSAffineTransform transform];   // identity
-    // [xform translateXBy: 0.0 yBy: -offsety / 3];                // adjust
-    [xform translateXBy: offsetx / 5 yBy: -offsety / 5];                // adjust
-    
     for (int y = 0; y < rows; y++) {
-        
-        // row
-        
-        [xform translateXBy: 0.0 yBy: offsety];
-        [xform set];
-        
         for (int x = 0; x < columns; x++) {
-            
-            // column
-            
-            [xform translateXBy: offsetx yBy: 0.0];
-            [xform set];
-            
             for (int i = 0; i < extrudes; i++) {
                 
                 // extrude
+                NSAffineTransform* xform = [NSAffineTransform transform];   // identity
+                [xform translateXBy: offsetx / 5.0+offsetx yBy: -offsety / 5.0+offsety];                // adjust
+                [xform translateXBy:offsetx*x yBy:offsety*y];
+                [xform translateXBy: -offsetz*i yBy: offsetz*i];
                 
                 if (x % 2 == 0) {
+                    [xform concat];
                     
-                    [xform translateXBy: -offsetz yBy: offsetz];
-                    [xform set];
                     [spiralPath stroke];
-                    
                 } else {
-                    
-                    [xform translateXBy: -offsetz yBy: offsetz];
                     [xform rotateByDegrees:180];
-                    [xform set];
+                    [xform concat];
+                    
                     [spiralPath stroke];
-                    [xform rotateByDegrees:-180];
                 }
+                
+                [xform invert];
+                [xform concat];
             }
-            
-            // reset extrude
-            
-            [xform translateXBy: offsetz * extrudes yBy: -offsetz * extrudes];
-            [xform set];
         }
-        
-        // reset column
-        
-        [xform translateXBy: -offsetx * columns yBy: 0.0];
-        [xform set];
     }
 }
 
@@ -201,7 +181,7 @@ indexdirection:(int)indexdirection {
     
         index+=indexdirection;
 
-        if (index > [points count] - 1) index = [points count] -1;
+        if (index > [points count] - 1) index = (int)[points count] -1;
         if (index < 0) index = 0;
     }
 
