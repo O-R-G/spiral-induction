@@ -2,7 +2,7 @@
 
 Spiral Induction
 Designed by Tauba Auerbach
-Version 1.1, macOS 10.8+, 2018
+Version 1.2, macOS 11+, 2023
 
 --
 
